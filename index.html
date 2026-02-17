@@ -4,731 +4,520 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <title>MathAR</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
 
 :root {
-  --purple: #c4a8ff;
-  --pink:   #ff9fd4;
-  --blue:   #8dd8ff;
-  --gold:   #ffd080;
-  --green:  #80ffcc;
-  --bg:     #08080f;
-  --text:   #f0e8ff;
-  --mono:   'Space Mono', monospace;
-  --sans:   'Syne', sans-serif;
+  --p: #c4a8ff; --pk: #ff9fd4; --b: #8dd8ff;
+  --g: #80ffcc; --o: #ffd080; --bg: #07070f;
+  --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
 }
-
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:var(--sans); }
+html,body { width:100%; height:100%; overflow:hidden; background:#000; font-family:var(--sans); }
 
-/* ══════════════════════════════
-   CAMERA
-══════════════════════════════ */
-#video {
-  position:fixed; inset:0; width:100%; height:100%;
-  object-fit:cover; z-index:0;
-}
+#video { position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
 
-/* ══════════════════════════════
-   SPLASH
-══════════════════════════════ */
+/* SPLASH */
 #splash {
-  position:fixed; inset:0; z-index:200;
-  background:var(--bg);
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:1.8rem; padding:2.4rem 2rem;
-  transition: opacity .7s ease, transform .7s ease;
+  position:fixed; inset:0; z-index:300; background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:1.6rem; padding:2rem; transition:opacity .6s, transform .6s;
 }
-#splash.exit { opacity:0; transform:scale(1.04); pointer-events:none; }
-
-.s-logo {
-  display:flex; flex-direction:column; align-items:center; gap:.5rem;
-}
-.s-ring {
-  width:80px; height:80px; border-radius:24px;
-  border:2px solid var(--purple);
+#splash.out { opacity:0; transform:scale(1.04); pointer-events:none; }
+.logo-ring {
+  width:76px; height:76px; border-radius:22px;
+  border:2px solid var(--p); background:rgba(196,168,255,.06);
   display:flex; align-items:center; justify-content:center;
-  font-size:2.4rem; color:var(--purple);
-  animation:ring-glow 2.8s ease-in-out infinite;
-  background:rgba(196,168,255,.06);
+  font-size:2.2rem; color:var(--p); animation:glow 2.5s ease-in-out infinite;
 }
-@keyframes ring-glow {
-  0%,100%{ box-shadow:0 0 20px rgba(196,168,255,.15); }
-  50%    { box-shadow:0 0 50px rgba(196,168,255,.45), 0 0 100px rgba(196,168,255,.1); }
-}
-.s-title {
-  font-size:3rem; font-weight:800; letter-spacing:-2px;
-  background:linear-gradient(130deg,var(--purple) 0%,var(--pink) 55%,var(--blue) 100%);
+@keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(196,168,255,.15);} 50%{box-shadow:0 0 50px rgba(196,168,255,.5);} }
+.logo-title {
+  font-size:2.8rem; font-weight:800; letter-spacing:-2px;
+  background:linear-gradient(130deg,var(--p),var(--pk),var(--b));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
-.s-sub {
-  font-family:var(--mono); font-size:.6rem; letter-spacing:4px;
-  color:#5a5070; text-transform:uppercase;
+.logo-sub { font-family:var(--mono); font-size:.58rem; letter-spacing:4px; color:#5a5070; text-transform:uppercase; }
+.intro-card {
+  width:100%; max-width:340px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(196,168,255,.12);
+  border-radius:18px; padding:1.4rem 1.5rem;
 }
+.ic-title { font-family:var(--mono); font-size:.56rem; letter-spacing:3px; color:var(--p); text-transform:uppercase; margin-bottom:1rem; }
+.ic-row { display:flex; gap:.9rem; align-items:flex-start; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.ic-row:last-child { border-bottom:none; }
+.ic-icon { font-size:1.3rem; flex-shrink:0; margin-top:1px; }
+.ic-text { font-size:.8rem; color:#b0a0c8; line-height:1.45; }
+.ic-text strong { color:#f0e8ff; }
+.btn-start {
+  width:100%; max-width:340px;
+  background:linear-gradient(135deg,var(--p),#8858e8);
+  border:none; border-radius:16px; padding:1.05rem;
+  font-family:var(--sans); font-size:1rem; font-weight:800; color:#07070f;
+  cursor:pointer; box-shadow:0 8px 32px rgba(196,168,255,.3); transition:transform .13s;
+}
+.btn-start:active { transform:scale(.97); }
 
-.s-card {
-  width:100%; max-width:360px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(196,168,255,.14);
-  border-radius:20px; padding:1.6rem;
-}
-.s-card-title {
-  font-family:var(--mono); font-size:.58rem; letter-spacing:3px;
-  color:var(--purple); text-transform:uppercase; margin-bottom:1.1rem;
-}
-.s-row {
-  display:flex; align-items:center; gap:1rem;
-  padding:.6rem 0; border-bottom:1px solid rgba(255,255,255,.04);
-}
-.s-row:last-child{ border-bottom:none; }
-.s-icon {
-  width:38px; height:38px; border-radius:12px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; font-size:1.2rem;
-}
-.ic-a{ background:rgba(196,168,255,.12); }
-.ic-b{ background:rgba(255,159,212,.10); }
-.ic-c{ background:rgba(141,216,255,.10); }
-.ic-d{ background:rgba(255,208,128,.10); }
-.s-row-txt{ font-size:.82rem; color:#c0b0d8; line-height:1.45; }
-.s-row-txt strong{ color:var(--text); }
-
-.s-btn {
-  width:100%; max-width:360px;
-  background:linear-gradient(135deg,var(--purple),#9060e8);
-  border:none; border-radius:18px; padding:1.1rem;
-  font-family:var(--sans); font-size:1rem; font-weight:800;
-  color:#08080f; cursor:pointer; letter-spacing:.3px;
-  box-shadow:0 8px 36px rgba(196,168,255,.28);
-  transition:transform .14s, box-shadow .14s;
-}
-.s-btn:active{ transform:scale(.97); box-shadow:0 4px 18px rgba(196,168,255,.18); }
-
-/* ══════════════════════════════
-   AR OVERLAY
-══════════════════════════════ */
-#overlay {
-  position:fixed; inset:0; z-index:10;
-  display:none; pointer-events:none;
-}
-#overlay.active{ display:block; }
-
-/* Canvas for formula rendering */
-#ar-canvas {
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  pointer-events:none;
-}
-
-/* Formulas container — each formula is a DOM element for interaction */
-#formulas-layer {
-  position:absolute; inset:0;
-  pointer-events:all;
-}
-
-/* ══════════════════════════════
-   FORMULA NODE
-══════════════════════════════ */
-.fnode {
-  position:absolute;
-  display:flex; flex-direction:column; align-items:flex-start;
-  padding:1rem 1.2rem 0.9rem;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(18px) saturate(1.4);
-  -webkit-backdrop-filter:blur(18px) saturate(1.4);
-  background:rgba(8,8,18,.62);
-  cursor:grab; touch-action:none;
-  transform-origin:center center;
-  transition:box-shadow .2s;
-  will-change:transform;
-  min-width:160px;
-}
-.fnode.dragging{
-  cursor:grabbing;
-  box-shadow:0 24px 60px rgba(0,0,0,.7) !important;
-  z-index:999 !important;
-  transition:none;
-}
-.fnode.scaled-down{ transform:scale(.85); }
-
-.fn-label {
-  font-family:var(--mono); font-size:.52rem;
-  letter-spacing:2.5px; text-transform:uppercase; margin-bottom:.25rem; opacity:.7;
-}
-.fn-name {
-  font-size:.78rem; font-weight:700; margin-bottom:.1rem; color:var(--text);
-}
-.fn-eq {
-  font-family:var(--mono); font-size:1.35rem; font-weight:700;
-  line-height:1.2; margin:.35rem 0;
-}
-.fn-desc {
-  font-size:.7rem; color:#a090c0; line-height:1.5; margin-top:.2rem; max-width:200px;
-}
-
-/* resize handle */
-.fn-handle {
-  position:absolute; bottom:6px; right:8px;
-  font-size:.7rem; opacity:.3; cursor:se-resize; touch-action:none;
-  font-family:var(--mono); color:#fff;
-}
-
-/* close button */
-.fn-close {
-  position:absolute; top:7px; right:10px;
-  font-size:.85rem; opacity:.35; cursor:pointer; color:#fff;
-  width:20px; height:20px; display:flex; align-items:center; justify-content:center;
-  border-radius:50%; transition:opacity .2s, background .2s;
-}
-.fn-close:hover{ opacity:1; background:rgba(255,80,80,.25); }
-
-/* glow ring that pulses */
-.fn-ring {
-  position:absolute; inset:-1px; border-radius:18px; pointer-events:none;
-  animation:node-pulse 3s ease-in-out infinite;
-}
-@keyframes node-pulse{
-  0%,100%{ opacity:.4; }
-  50%{ opacity:1; }
-}
-
-/* ══════════════════════════════
-   HUD ELEMENTS
-══════════════════════════════ */
-/* Top bar */
-#hud-top {
+/* HUD */
+#hud {
   position:fixed; top:0; left:0; right:0; z-index:50;
   display:none; align-items:center; justify-content:space-between;
-  padding:.9rem 1.2rem;
-  background:linear-gradient(to bottom, rgba(8,8,18,.75) 0%, transparent 100%);
-  pointer-events:all;
+  padding:.85rem 1.1rem;
+  background:linear-gradient(to bottom,rgba(7,7,15,.8) 0%,transparent 100%);
 }
-#hud-top.active{ display:flex; }
-
+#hud.on { display:flex; }
 .hud-logo {
-  font-family:var(--sans); font-size:1.1rem; font-weight:800;
-  background:linear-gradient(90deg,var(--purple),var(--pink));
+  font-weight:800; font-size:1.05rem;
+  background:linear-gradient(90deg,var(--p),var(--pk));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
-.hud-status {
-  display:flex; align-items:center; gap:.45rem;
-  background:rgba(8,8,18,.7); border:1px solid rgba(196,168,255,.18);
-  border-radius:20px; padding:.28rem .8rem;
-  font-family:var(--mono); font-size:.58rem; color:var(--purple); letter-spacing:1.5px;
-  backdrop-filter:blur(10px);
+.hud-badge {
+  display:flex; align-items:center; gap:.4rem;
+  background:rgba(7,7,15,.75); border:1px solid rgba(196,168,255,.2);
+  border-radius:20px; padding:.25rem .75rem;
+  font-family:var(--mono); font-size:.56rem; color:var(--p); letter-spacing:1.5px;
+  backdrop-filter:blur(8px); cursor:pointer;
 }
-.hud-dot {
-  width:6px; height:6px; border-radius:50%; background:#80ffcc;
-  animation:blink 1.8s ease-in-out infinite;
-}
-@keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--g); animation:blink 1.6s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
 
-/* Bottom toolbar */
-#toolbar {
-  position:fixed; bottom:0; left:0; right:0; z-index:50;
-  display:none;
-  padding:.7rem .9rem 1.4rem;
-  background:linear-gradient(to top, rgba(8,8,18,.92) 55%, transparent 100%);
-  pointer-events:all;
-}
-#toolbar.active{ display:block; }
+/* CANVAS for lines */
+#line-canvas { position:fixed; inset:0; z-index:25; pointer-events:none; }
 
-.tb-label {
-  font-family:var(--mono); font-size:.52rem; letter-spacing:3px;
-  color:#4a4060; text-transform:uppercase; text-align:center; margin-bottom:.6rem;
-}
-.tb-pills {
-  display:flex; gap:.45rem; overflow-x:auto; padding-bottom:.2rem;
-  scrollbar-width:none;
-}
-.tb-pills::-webkit-scrollbar{ display:none; }
+/* SCANLINE */
+#scanline { position:fixed; left:0; right:0; height:1px; z-index:20; display:none;
+  background:linear-gradient(90deg,transparent,rgba(196,168,255,.55),transparent);
+  animation:scanmove 5s linear infinite; pointer-events:none; }
+#scanline.on { display:block; }
+@keyframes scanmove { from{top:-1px} to{top:100vh} }
+.corner { position:fixed; width:22px; height:22px; z-index:20; pointer-events:none; display:none; }
+.corner.on { display:block; }
+.corner::before,.corner::after { content:''; position:absolute; background:rgba(196,168,255,.45); }
+.ctL{top:.9rem;left:.9rem} .ctL::before{top:0;left:0;width:2px;height:100%} .ctL::after{top:0;left:0;width:100%;height:2px}
+.ctR{top:.9rem;right:.9rem} .ctR::before{top:0;right:0;width:2px;height:100%} .ctR::after{top:0;right:0;width:100%;height:2px}
+.cbL{bottom:6.5rem;left:.9rem} .cbL::before{bottom:0;left:0;width:2px;height:100%} .cbL::after{bottom:0;left:0;width:100%;height:2px}
+.cbR{bottom:6.5rem;right:.9rem} .cbR::before{bottom:0;right:0;width:2px;height:100%} .cbR::after{bottom:0;right:0;width:100%;height:2px}
 
-.tb-pill {
-  flex-shrink:0;
-  display:flex; flex-direction:column; align-items:center; gap:.3rem;
-  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
-  border-radius:14px; padding:.7rem .9rem;
-  cursor:pointer; transition:all .2s;
-  min-width:70px;
-}
-.tb-pill:active{ transform:scale(.94); }
-.tb-pill .tp-icon{ font-size:1.4rem; }
-.tb-pill .tp-name{
-  font-family:var(--mono); font-size:.52rem; color:#7060a0; letter-spacing:.5px;
-  text-align:center; white-space:nowrap;
-}
-
-/* ══════════════════════════════
-   SCAN EFFECT
-══════════════════════════════ */
-.scan-line {
-  position:fixed; left:0; right:0; height:1px; z-index:15;
-  background:linear-gradient(90deg,transparent,rgba(196,168,255,.6),transparent);
-  animation:scan 5s linear infinite; pointer-events:none; display:none;
-}
-.scan-line.active{ display:block; }
-@keyframes scan{ from{top:0} to{top:100vh} }
-
-/* corners */
-.corner{ position:fixed; width:24px; height:24px; z-index:15; pointer-events:none; display:none; }
-.corner.active{ display:block; }
-.corner::before,.corner::after{ content:''; position:absolute; background:rgba(196,168,255,.5); }
-.c-tl{ top:1rem; left:1rem; }
-.c-tl::before{ top:0;left:0;width:2px;height:100%; }
-.c-tl::after{  top:0;left:0;width:100%;height:2px; }
-.c-tr{ top:1rem; right:1rem; }
-.c-tr::before{ top:0;right:0;width:2px;height:100%; }
-.c-tr::after{  top:0;right:0;width:100%;height:2px; }
-.c-bl{ bottom:7rem; left:1rem; }
-.c-bl::before{ bottom:0;left:0;width:2px;height:100%; }
-.c-bl::after{  bottom:0;left:0;width:100%;height:2px; }
-.c-br{ bottom:7rem; right:1rem; }
-.c-br::before{ bottom:0;right:0;width:2px;height:100%; }
-.c-br::after{  bottom:0;right:0;width:100%;height:2px; }
-
-/* ══════════════════════════════
-   PERMISSION ERROR
-══════════════════════════════ */
-#cam-error {
-  position:fixed; inset:0; z-index:300;
-  background:var(--bg); display:none;
+/* AI OVERLAY */
+#ai-overlay {
+  position:fixed; inset:0; z-index:200; display:none;
   flex-direction:column; align-items:center; justify-content:center;
-  gap:1.2rem; padding:2rem; text-align:center;
+  background:rgba(7,7,15,.88); gap:1rem; pointer-events:none;
 }
-#cam-error.show{ display:flex; }
-.err-icon{ font-size:3rem; }
-.err-title{ font-size:1.3rem; font-weight:800; color:var(--text); }
-.err-msg{ font-size:.85rem; color:#7060a0; line-height:1.6; max-width:300px; }
-.err-btn {
-  background:rgba(196,168,255,.12); border:1px solid rgba(196,168,255,.3);
-  border-radius:14px; padding:.8rem 1.8rem;
-  font-family:var(--mono); font-size:.75rem; color:var(--purple);
-  cursor:pointer; letter-spacing:1px;
+#ai-overlay.on { display:flex; }
+.ai-ring { width:72px; height:72px; border-radius:50%; border:3px solid transparent;
+  border-top-color:var(--p); border-right-color:var(--pk); animation:spin 1s linear infinite; }
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.ai-text { font-family:var(--mono); font-size:.68rem; color:var(--p); letter-spacing:3px; text-transform:uppercase; }
+.ai-sub { font-size:.75rem; color:#5a5070; }
+
+/* FORMULA BUBBLE */
+.fbubble {
+  position:fixed; z-index:40;
+  background:rgba(7,7,15,.84); border-radius:16px;
+  padding:.9rem 1.1rem .8rem 1rem;
+  backdrop-filter:blur(22px) saturate(1.5); -webkit-backdrop-filter:blur(22px) saturate(1.5);
+  border:1px solid rgba(255,255,255,.1); max-width:205px; min-width:145px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+  animation:bubIn .45s cubic-bezier(.34,1.56,.64,1) forwards;
+  cursor:grab; touch-action:none;
 }
+.fbubble.dragging { cursor:grabbing; box-shadow:0 20px 60px rgba(0,0,0,.75); transition:none; }
+@keyframes bubIn { from{opacity:0;transform:scale(.6) translateY(8px);} to{opacity:1;transform:scale(1) translateY(0);} }
+.fb-close {
+  position:absolute; top:6px; right:8px; font-size:.75rem; color:#fff;
+  opacity:.3; cursor:pointer; width:18px; height:18px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; transition:opacity .2s, background .2s;
+}
+.fb-close:hover { opacity:1; background:rgba(255,60,60,.25); }
+.fb-obj { font-family:var(--mono); font-size:.5rem; letter-spacing:2.5px; text-transform:uppercase; opacity:.65; margin-bottom:.2rem; }
+.fb-name { font-size:.72rem; font-weight:700; color:#f0e8ff; margin-bottom:.05rem; }
+.fb-eq { font-family:var(--mono); font-size:1.15rem; font-weight:700; margin:.3rem 0; animation:eqglow 3s ease-in-out infinite; }
+@keyframes eqglow { 0%,100%{text-shadow:none;} 50%{text-shadow:0 0 16px currentColor;} }
+.fb-desc { font-size:.63rem; color:#9080b0; line-height:1.45; }
+
+/* TOOLBAR */
+#toolbar {
+  position:fixed; bottom:0; left:0; right:0; z-index:50; display:none;
+  padding:.6rem .8rem 1.3rem;
+  background:linear-gradient(to top,rgba(7,7,15,.95) 55%,transparent 100%);
+}
+#toolbar.on { display:block; }
+.tb-hint { font-family:var(--mono); font-size:.5rem; letter-spacing:2.5px; color:#3a3050; text-transform:uppercase; text-align:center; margin-bottom:.5rem; }
+.tb-row { display:flex; gap:.4rem; overflow-x:auto; scrollbar-width:none; }
+.tb-row::-webkit-scrollbar{display:none;}
+.tb-btn {
+  flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:.28rem;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07);
+  border-radius:13px; padding:.6rem .8rem; cursor:pointer; transition:all .18s; min-width:65px;
+}
+.tb-btn:active { transform:scale(.93); }
+.tb-icon { font-size:1.3rem; }
+.tb-lbl { font-family:var(--mono); font-size:.48rem; letter-spacing:.5px; color:#6050a0; text-align:center; white-space:nowrap; }
+
+/* ERROR */
+#err { position:fixed; inset:0; z-index:400; background:var(--bg); display:none;
+  flex-direction:column; align-items:center; justify-content:center; gap:1rem; padding:2rem; text-align:center; }
+#err.on { display:flex; }
+.err-icon{font-size:3rem} .err-title{font-size:1.2rem;font-weight:800;color:#f0e8ff}
+.err-msg{font-size:.8rem;color:#7060a0;line-height:1.65;max-width:300px}
+.err-code{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.9rem 1.1rem;font-family:var(--mono);font-size:.65rem;color:#9080b0;line-height:1.8;max-width:300px;text-align:left;}
+.err-btn{background:rgba(196,168,255,.1);border:1px solid rgba(196,168,255,.25);border-radius:12px;padding:.7rem 1.6rem;font-family:var(--mono);font-size:.7rem;color:var(--p);cursor:pointer;letter-spacing:1px;}
 </style>
 </head>
 <body>
 
-<!-- Camera feed -->
 <video id="video" autoplay playsinline muted></video>
+<canvas id="line-canvas"></canvas>
 
-<!-- ══════ SPLASH ══════ -->
+<!-- SPLASH -->
 <div id="splash">
-  <div class="s-logo">
-    <div class="s-ring">∑</div>
-    <div class="s-title">MathAR</div>
-    <div class="s-sub">Matematica nella realtà aumentata</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:.45rem">
+    <div class="logo-ring">∑</div>
+    <div class="logo-title">MathAR</div>
+    <div class="logo-sub">AI · Fotocamera · Formule Vive</div>
   </div>
-
-  <div class="s-card">
-    <div class="s-card-title">Come funziona</div>
-    <div class="s-row">
-      <div class="s-icon ic-a">📷</div>
-      <div class="s-row-txt"><strong>Fotocamera reale</strong> — vedi il mondo attorno a te con le formule sopra</div>
-    </div>
-    <div class="s-row">
-      <div class="s-icon ic-b">✋</div>
-      <div class="s-row-txt"><strong>Trascina</strong> le formule dove vuoi nello spazio</div>
-    </div>
-    <div class="s-row">
-      <div class="s-icon ic-c">🔍</div>
-      <div class="s-row-txt"><strong>Pizzica</strong> per ingrandire o rimpicciolire</div>
-    </div>
-    <div class="s-row">
-      <div class="s-icon ic-d">➕</div>
-      <div class="s-row-txt"><strong>Aggiungi</strong> nuove formule dal menu in basso</div>
-    </div>
+  <div class="intro-card">
+    <div class="ic-title">Come funziona</div>
+    <div class="ic-row"><div class="ic-icon">🤖</div><div class="ic-text"><strong>L'AI analizza</strong> la scena inquadrata e riconosce gli oggetti</div></div>
+    <div class="ic-row"><div class="ic-icon">✨</div><div class="ic-text"><strong>Le formule appaiono</strong> collegate all'oggetto con una linea animata</div></div>
+    <div class="ic-row"><div class="ic-icon">✋</div><div class="ic-text"><strong>Trascina e pizzica</strong> le formule dove vuoi</div></div>
+    <div class="ic-row"><div class="ic-icon">🔁</div><div class="ic-text"><strong>Tocca "SCANSIONA"</strong> per analizzare di nuovo la scena</div></div>
   </div>
-
-  <button class="s-btn" onclick="startAR()">📷 &nbsp;Avvia Fotocamera</button>
+  <button class="btn-start" onclick="startAR()">📷 &nbsp;Avvia MathAR</button>
 </div>
 
-<!-- ══════ CAMERA ERROR ══════ -->
-<div id="cam-error">
+<!-- ERROR -->
+<div id="err">
   <div class="err-icon">🔒</div>
-  <div class="err-title">Fotocamera non disponibile</div>
-  <div class="err-msg">
-    Il browser ha bloccato l'accesso alla fotocamera.<br><br>
-    Questa app funziona solo su <strong>HTTPS</strong>.<br>
-    Carica il file su <strong>GitHub Pages</strong> (gratuito) per usarla sul telefono.
-  </div>
-  <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem 1.2rem;font-family:var(--mono);font-size:.7rem;color:#9080b0;line-height:1.8;max-width:300px;text-align:left;">
-    <div style="color:var(--purple);margin-bottom:.4rem;">ISTRUZIONI GITHUB PAGES:</div>
-    1. Vai su github.com → New repo<br>
-    2. Carica questo file come index.html<br>
-    3. Settings → Pages → Deploy from main<br>
-    4. Apri il link sul telefono ✓
-  </div>
-  <button class="err-btn" onclick="location.reload()">↻ &nbsp;Riprova</button>
+  <div class="err-title">Fotocamera bloccata</div>
+  <div class="err-msg">Apri questo link dal tuo telefono tramite GitHub Pages (HTTPS):</div>
+  <div class="err-code"><span style="color:var(--p)">IL TUO LINK:</span><br>edilorenzo700-droid<br>.github.io/mathar</div>
+  <button class="err-btn" onclick="location.reload()">↻ Riprova</button>
 </div>
 
-<!-- ══════ HUD ══════ -->
-<div id="hud-top">
+<!-- HUD -->
+<div id="hud">
   <div class="hud-logo">MathAR</div>
-  <div class="hud-status">
-    <div class="hud-dot"></div>
-    AR LIVE
+  <div class="hud-badge" onclick="triggerAIScan()">
+    <div class="live-dot"></div>
+    <span id="hud-txt">SCANSIONA</span>
   </div>
 </div>
 
-<!-- Scan + corners -->
-<div class="scan-line" id="scan"></div>
-<div class="corner c-tl" id="c1"></div>
-<div class="corner c-tr" id="c2"></div>
-<div class="corner c-bl" id="c3"></div>
-<div class="corner c-br" id="c4"></div>
-
-<!-- ══════ OVERLAY ══════ -->
-<div id="overlay">
-  <div id="formulas-layer"></div>
+<!-- AI overlay -->
+<div id="ai-overlay">
+  <div class="ai-ring"></div>
+  <div class="ai-text">ANALISI AI</div>
+  <div class="ai-sub" id="ai-sub">Riconosco gli oggetti...</div>
 </div>
 
-<!-- ══════ TOOLBAR ══════ -->
+<!-- Corners + scanline -->
+<div id="scanline"></div>
+<div class="corner ctL on"></div><div class="corner ctR on"></div>
+<div class="corner cbL on"></div><div class="corner cbR on"></div>
+
+<!-- TOOLBAR -->
 <div id="toolbar">
-  <div class="tb-label">+ aggiungi formula</div>
-  <div class="tb-pills" id="tb-pills"></div>
+  <div class="tb-hint">+ aggiungi formula manualmente</div>
+  <div class="tb-row" id="tb-row"></div>
 </div>
 
 <script>
-// ══════════════════════════════════════════
-//  FORMULA DEFINITIONS
-// ══════════════════════════════════════════
-const FORMULAS = [
-  {
-    id:'trig1', label:'Trigonometria', name:'Identità fondamentale',
-    eq:'sin²x + cos²x = 1',
-    desc:'Vera per qualunque angolo x',
-    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+// ══════ DATABASE ══════
+const DB = {
+  lamp: { icon:'💡', label:'Lampada · Luce', color:'#ffd080', objects:['lamp','light','bulb','chandelier','ceiling light','lantern','spotlight'],
+    formulas:[
+      { name:'Intensità luminosa', eq:'I = P / 4πr²', desc:'Diminuisce col quadrato della distanza' },
+      { name:'Velocità della luce', eq:'c = λ · f', desc:'Lunghezza d\'onda × frequenza' },
+      { name:'Legge di Snell', eq:'n₁sinθ₁=n₂sinθ₂', desc:'Rifrazione tra due mezzi' },
+    ]
   },
-  {
-    id:'trig2', label:'Trigonometria', name:'Definizione del seno',
-    eq:'sin x = opp/ip',
-    desc:'Opposto su ipotenusa nel triangolo rettangolo',
-    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+  window_: { icon:'🪟', label:'Finestra · Vetro', color:'#8dd8ff', objects:['window','glass','door','frame','curtain','opening'],
+    formulas:[
+      { name:'Indice di rifrazione', eq:'n = c / v', desc:'Rapporto velocità luce/vetro' },
+      { name:'Angolo critico', eq:'θ_c = arcsin(1/n)', desc:'Oltre: riflessione totale interna' },
+      { name:'Trasmittanza', eq:'T = I_t / I₀', desc:'Frazione di luce trasmessa' },
+    ]
   },
-  {
-    id:'trig3', label:'Trigonometria', name:'Definizione del coseno',
-    eq:'cos x = adj/ip',
-    desc:'Adiacente su ipotenusa',
-    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+  table: { icon:'🪑', label:'Superficie', color:'#80ffcc', objects:['table','desk','chair','floor','surface','furniture','sofa','couch','shelf','bookshelf','counter','bench'],
+    formulas:[
+      { name:'Area rettangolo', eq:'A = b × h', desc:'Base × altezza' },
+      { name:'Forza d\'attrito', eq:'f = μ · N', desc:'μ = coeff. attrito statico/dinamico' },
+      { name:'Pressione', eq:'P = F / A', desc:'Forza distribuita su area' },
+    ]
   },
-  {
-    id:'pit', label:'Geometria', name:'Teorema di Pitagora',
-    eq:'a² + b² = c²',
-    desc:'Vale in ogni triangolo rettangolo',
-    color:'#ffd080', bg:'rgba(255,180,40,.08)'
+  person: { icon:'🧑', label:'Corpo umano', color:'#ff9fd4', objects:['person','man','woman','human','face','body','people','student','teacher','hand'],
+    formulas:[
+      { name:'II Legge di Newton', eq:'F = m · a', desc:'Forza = massa × accelerazione' },
+      { name:'Energia cinetica', eq:'Eₖ = ½mv²', desc:'Energia del corpo in movimento' },
+      { name:'Momento angolare', eq:'L = I · ω', desc:'Inerzia × velocità angolare' },
+    ]
   },
-  {
-    id:'mot1', label:'Cinematica', name:'Velocità finale',
-    eq:'v = v₀ + a·t',
-    desc:'Moto uniformemente accelerato',
-    color:'#8dd8ff', bg:'rgba(60,160,255,.08)'
+  book: { icon:'📚', label:'Libro · Schermo', color:'#c4a8ff', objects:['book','notebook','paper','laptop','computer','screen','monitor','keyboard','tablet','phone'],
+    formulas:[
+      { name:'Identità di Eulero', eq:'e^(iπ)+1=0', desc:'La più bella formula della matematica' },
+      { name:'Formula quadratica', eq:'x=(-b±√Δ)/2a', desc:'Δ = b² − 4ac' },
+      { name:'Derivata', eq:'f\'(x)=lim[f(x+h)-f(x)]/h', desc:'h→0: tasso di variazione istantaneo' },
+    ]
   },
-  {
-    id:'mot2', label:'Cinematica', name:'Spazio percorso',
-    eq:'s = v₀t + ½at²',
-    desc:'Distanza in funzione del tempo',
-    color:'#8dd8ff', bg:'rgba(60,160,255,.08)'
+  wall: { icon:'🧱', label:'Muro · Spazio', color:'#ffd080', objects:['wall','ceiling','floor','building','room','corner','architecture','brick'],
+    formulas:[
+      { name:'Teorema di Pitagora', eq:'a² + b² = c²', desc:'Triangolo rettangolo' },
+      { name:'Teorema di Tales', eq:'AB/DE = BC/EF', desc:'Triangoli simili: lati proporzionali' },
+      { name:'Area triangolo', eq:'A = ½ · b · h', desc:'Base × altezza / 2' },
+    ]
   },
-  {
-    id:'mot3', label:'Cinematica', name:'Teorema delle velocità',
-    eq:'v² = v₀² + 2as',
-    desc:'Senza dipendenza dal tempo',
-    color:'#8dd8ff', bg:'rgba(60,160,255,.08)'
+  sky: { icon:'🌤', label:'Cielo · Aria', color:'#8dd8ff', objects:['sky','cloud','outdoor','outside','tree','plant','nature','window','atmosphere'],
+    formulas:[
+      { name:'Gas perfetti', eq:'PV = nRT', desc:'Pressione, volume, temperatura, moli' },
+      { name:'Velocità del suono', eq:'v = √(γRT/M)', desc:'Dipende da T e composizione' },
+      { name:'Pressione atm.', eq:'P = ρ·g·h', desc:'Colonna d\'aria sovrastante' },
+    ]
   },
-  {
-    id:'ein', label:'Relatività', name:'Einstein',
-    eq:'E = mc²',
-    desc:'Energia e massa sono equivalenti',
-    color:'#80ffcc', bg:'rgba(40,255,160,.07)'
-  },
-  {
-    id:'newt', label:'Dinamica', name:'Seconda legge di Newton',
-    eq:'F = m · a',
-    desc:'Forza = massa × accelerazione',
-    color:'#c4a8ff', bg:'rgba(150,100,255,.08)'
-  },
-  {
-    id:'grav', label:'Gravitazione', name:'Legge di gravitazione',
-    eq:'F = G·m₁m₂/r²',
-    desc:'Attrazione tra due masse',
-    color:'#c4a8ff', bg:'rgba(150,100,255,.08)'
-  },
-  {
-    id:'euler', label:'Analisi', name:'Identità di Eulero',
-    eq:'e^(iπ) + 1 = 0',
-    desc:'La più bella equazione della matematica',
-    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
-  },
-  {
-    id:'quad', label:'Algebra', name:'Formula quadratica',
-    eq:'x = (-b ± √Δ)/2a',
-    desc:'Δ = b² - 4ac',
-    color:'#ffd080', bg:'rgba(255,180,40,.08)'
-  },
-];
+  default: { icon:'✨', label:'Fenomeno fisico', color:'#c4a8ff', objects:[],
+    formulas:[
+      { name:'Einstein', eq:'E = mc²', desc:'Energia e massa equivalenti' },
+      { name:'Gravitazione', eq:'F=Gm₁m₂/r²', desc:'Attrazione universale tra masse' },
+      { name:'Equazione d\'onda', eq:'∂²y/∂t²=v²∂²y/∂x²', desc:'Propagazione di onde' },
+    ]
+  }
+};
 
-// ══════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════
-let activeNodes = [];
-let zCounter = 20;
+// ══════ STATE ══════
+let bubbles = [], zTop = 30;
+const canvas = document.getElementById('line-canvas');
+const ctx = canvas.getContext('2d');
 
-// ══════════════════════════════════════════
-//  START AR
-// ══════════════════════════════════════════
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ══════ START AR ══════
 async function startAR() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1920 }, height: { ideal: 1080 }
-      },
-      audio: false
+      video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } },
+      audio:false
     });
+    const vid = document.getElementById('video');
+    vid.srcObject = stream;
+    vid.style.transform = 'none';
+    await vid.play();
 
-    const video = document.getElementById('video');
-    video.srcObject = stream;
-    await video.play();
-
-    // Activate UI
-    document.getElementById('splash').classList.add('exit');
-    setTimeout(() => document.getElementById('splash').style.display = 'none', 700);
-
-    document.getElementById('overlay').classList.add('active');
-    document.getElementById('hud-top').classList.add('active');
-    document.getElementById('toolbar').classList.add('active');
-    document.getElementById('scan').classList.add('active');
-    ['c1','c2','c3','c4'].forEach(id => document.getElementById(id).classList.add('active'));
+    document.getElementById('splash').classList.add('out');
+    setTimeout(() => document.getElementById('splash').style.display='none', 650);
+    document.getElementById('hud').classList.add('on');
+    document.getElementById('toolbar').classList.add('on');
+    document.getElementById('scanline').classList.add('on');
 
     buildToolbar();
-
-    // Spawn a few starter formulas
-    setTimeout(() => spawnFormula('trig1', .2, .25), 300);
-    setTimeout(() => spawnFormula('pit',   .55, .18), 700);
-    setTimeout(() => spawnFormula('mot1',  .1,  .55), 1100);
-
-  } catch(err) {
-    console.error(err);
-    document.getElementById('cam-error').classList.add('show');
+    drawLines();
+    setTimeout(triggerAIScan, 1200);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('err').classList.add('on');
   }
 }
 
-// ══════════════════════════════════════════
-//  BUILD TOOLBAR
-// ══════════════════════════════════════════
-function buildToolbar() {
-  const pill = document.getElementById('tb-pills');
-  const icons = {
-    'Trigonometria':'📐','Geometria':'△','Cinematica':'⚡',
-    'Relatività':'✨','Dinamica':'💥','Gravitazione':'🌍',
-    'Analisi':'∞','Algebra':'🔣'
-  };
-  FORMULAS.forEach(f => {
-    const el = document.createElement('div');
-    el.className = 'tb-pill';
-    el.style.borderColor = f.color + '33';
-    el.innerHTML = `
-      <div class="tp-icon">${icons[f.label] || '∑'}</div>
-      <div class="tp-name" style="color:${f.color};">${f.name.split(' ').slice(0,2).join(' ')}</div>
-    `;
-    el.addEventListener('pointerdown', () => {
-      // spawn at center with slight random offset
-      spawnFormula(f.id, .3 + Math.random()*.35, .2 + Math.random()*.35);
+// ══════ AI SCAN ══════
+async function triggerAIScan() {
+  const ov = document.getElementById('ai-overlay');
+  const sub = document.getElementById('ai-sub');
+  ov.classList.add('on');
+  ov.style.pointerEvents = 'all';
+  sub.textContent = 'Scatto il fotogramma...';
+  document.getElementById('hud-txt').textContent = 'ANALISI...';
+
+  const vid = document.getElementById('video');
+  const snap = document.createElement('canvas');
+  snap.width = Math.min(vid.videoWidth || 640, 640);
+  snap.height = Math.min(vid.videoHeight || 480, 480);
+  snap.getContext('2d').drawImage(vid, 0, 0, snap.width, snap.height);
+  const b64 = snap.toDataURL('image/jpeg', 0.75).split(',')[1];
+
+  sub.textContent = 'AI in analisi...';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:200,
+        messages:[{
+          role:'user',
+          content:[
+            { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:b64 } },
+            { type:'text', text:'List ONLY the main objects you see in this room image. Reply with ONLY a comma-separated list of object names in English (max 6 items). No other text. Example: table, lamp, window, book, person, wall' }
+          ]
+        }]
+      })
     });
-    pill.appendChild(el);
-  });
+    const data = await resp.json();
+    const raw = data.content?.[0]?.text || '';
+    const detected = raw.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
+    console.log('Detected:', detected);
+    ov.classList.remove('on');
+    ov.style.pointerEvents = 'none';
+    processDetections(detected);
+  } catch(e) {
+    console.error(e);
+    ov.classList.remove('on');
+    ov.style.pointerEvents = 'none';
+    processDetections(['table','window','lamp']);
+  }
 }
 
-// ══════════════════════════════════════════
-//  SPAWN FORMULA NODE
-// ══════════════════════════════════════════
-function spawnFormula(id, relX, relY) {
-  const def = FORMULAS.find(f => f.id === id);
-  if (!def) return;
+// ══════ PROCESS DETECTIONS ══════
+function processDetections(detected) {
+  const matched = new Set();
+  detected.forEach(word => {
+    Object.entries(DB).forEach(([key, cat]) => {
+      if (key==='default') return;
+      if (cat.objects.some(o => word.includes(o) || o.includes(word))) matched.add(key);
+    });
+  });
+  if (matched.size===0) matched.add('default');
 
-  const layer = document.getElementById('formulas-layer');
+  // Remove old bubbles
+  bubbles.forEach(b => b.el?.remove());
+  bubbles = [];
+
+  const keys = [...matched].slice(0, 4);
   const vw = window.innerWidth, vh = window.innerHeight;
+  const positions = [
+    {x:vw*.07, y:vh*.12}, {x:vw*.48, y:vh*.10},
+    {x:vw*.05, y:vh*.48}, {x:vw*.5,  y:vh*.50},
+  ];
+  // Origins spread across the middle of the screen
+  const origins = [
+    {x:vw*.25, y:vh*.5}, {x:vw*.6, y:vh*.45},
+    {x:vw*.3,  y:vh*.65},{x:vw*.65, y:vh*.65},
+  ];
 
-  const node = document.createElement('div');
-  node.className = 'fnode';
-  node.style.cssText = `
-    left:${relX * vw}px;
-    top:${relY * vh}px;
-    z-index:${++zCounter};
-    border-color:${def.color}40;
-    background:rgba(8,8,18,.64);
-    box-shadow:0 8px 40px rgba(0,0,0,.55), 0 0 0 1px ${def.color}22, inset 0 1px 0 rgba(255,255,255,.05);
-    animation:node-appear .4s cubic-bezier(.34,1.56,.64,1);
-  `;
-
-  node.innerHTML = `
-    <style>
-      @keyframes node-appear{from{opacity:0;transform:scale(.7) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
-    </style>
-    <div class="fn-ring" style="border:1px solid ${def.color}30; box-shadow:inset 0 0 20px ${def.color}08;"></div>
-    <div class="fn-close" onclick="removeNode(this.parentNode)">✕</div>
-    <div class="fn-label" style="color:${def.color}bb;">${def.label}</div>
-    <div class="fn-name">${def.name}</div>
-    <div class="fn-eq" style="color:${def.color};">${def.eq}</div>
-    <div class="fn-desc">${def.desc}</div>
-    <div class="fn-handle">⤡</div>
-  `;
-
-  layer.appendChild(node);
-  activeNodes.push(node);
-
-  makeDraggable(node);
-  makePinchable(node);
-
-  return node;
-}
-
-// ══════════════════════════════════════════
-//  REMOVE NODE
-// ══════════════════════════════════════════
-function removeNode(node) {
-  node.style.transition = 'opacity .3s, transform .3s';
-  node.style.opacity = '0';
-  node.style.transform = 'scale(.7)';
-  setTimeout(() => node.remove(), 300);
-  activeNodes = activeNodes.filter(n => n !== node);
-}
-
-// ══════════════════════════════════════════
-//  DRAGGABLE (touch + mouse)
-// ══════════════════════════════════════════
-function makeDraggable(node) {
-  let startX, startY, initLeft, initTop;
-  let dragging = false;
-  const handle = node; // drag from whole card
-
-  function onDown(e) {
-    // Ignore close button and resize handle
-    if (e.target.classList.contains('fn-close')) return;
-    if (e.target.classList.contains('fn-handle')) return;
-
-    dragging = true;
-    node.classList.add('dragging');
-    node.style.zIndex = ++zCounter;
-
-    const touch = e.touches ? e.touches[0] : e;
-    startX = touch.clientX;
-    startY = touch.clientY;
-    initLeft = parseFloat(node.style.left) || 0;
-    initTop  = parseFloat(node.style.top)  || 0;
-
-    e.preventDefault();
-  }
-
-  function onMove(e) {
-    if (!dragging) return;
-    const touch = e.touches ? e.touches[0] : e;
-    const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
-    node.style.left = (initLeft + dx) + 'px';
-    node.style.top  = (initTop  + dy) + 'px';
-    e.preventDefault();
-  }
-
-  function onUp() {
-    dragging = false;
-    node.classList.remove('dragging');
-  }
-
-  node.addEventListener('touchstart',  onDown, { passive:false });
-  node.addEventListener('touchmove',   onMove, { passive:false });
-  node.addEventListener('touchend',    onUp);
-  node.addEventListener('mousedown',   onDown);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup',   onUp);
-
-  // Resize handle
-  const rh = node.querySelector('.fn-handle');
-  let resizing = false;
-  let resStartX, resStartScale;
-
-  rh.addEventListener('touchstart', e => {
-    resizing = true;
-    resStartX = e.touches[0].clientX;
-    resStartScale = currentScale(node);
-    e.stopPropagation(); e.preventDefault();
-  }, { passive:false });
-
-  rh.addEventListener('mousedown', e => {
-    resizing = true;
-    resStartX = e.clientX;
-    resStartScale = currentScale(node);
-    e.stopPropagation(); e.preventDefault();
+  keys.forEach((key, i) => {
+    const cat = DB[key];
+    const f = cat.formulas[i % cat.formulas.length];
+    spawnBubble(f, cat, positions[i]||{x:vw*.2,y:vh*.2}, origins[i]||{x:vw*.5,y:vh*.5});
   });
 
-  window.addEventListener('touchmove', e => {
-    if (!resizing) return;
-    const dx = e.touches[0].clientX - resStartX;
-    const s = Math.max(.5, Math.min(2.5, resStartScale + dx/150));
-    setScale(node, s);
-  }, { passive:false });
+  document.getElementById('hud-txt').textContent = `${keys.length} OGGETTI`;
+}
 
-  window.addEventListener('mousemove', e => {
-    if (!resizing) return;
-    const dx = e.clientX - resStartX;
-    const s = Math.max(.5, Math.min(2.5, resStartScale + dx/150));
-    setScale(node, s);
+// ══════ SPAWN BUBBLE ══════
+function spawnBubble(formula, cat, pos, origin) {
+  const el = document.createElement('div');
+  el.className = 'fbubble';
+  el.style.cssText = `left:${pos.x}px;top:${pos.y}px;z-index:${++zTop};border-color:${cat.color}35;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px ${cat.color}20;`;
+  el.innerHTML = `
+    <div class="fb-close" onclick="removeBubble(this.parentNode)">✕</div>
+    <div class="fb-obj" style="color:${cat.color}bb;">${cat.icon} ${cat.label}</div>
+    <div class="fb-name">${formula.name}</div>
+    <div class="fb-eq" style="color:${cat.color}">${formula.eq}</div>
+    <div class="fb-desc">${formula.desc}</div>
+  `;
+  document.body.appendChild(el);
+  const b = { el, x:pos.x, y:pos.y, ox:origin.x, oy:origin.y, color:cat.color };
+  bubbles.push(b);
+  makeDraggable(el, b);
+  makePinchable(el);
+  return b;
+}
+
+function removeBubble(el) {
+  el.style.transition='opacity .3s,transform .3s'; el.style.opacity='0'; el.style.transform='scale(.6)';
+  setTimeout(()=>{ el.remove(); bubbles=bubbles.filter(b=>b.el!==el); }, 300);
+}
+
+// ══════ DRAW LINES ══════
+function drawLines() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const t = performance.now();
+  bubbles.forEach(b => {
+    if (!b.el?.isConnected) return;
+    const r = b.el.getBoundingClientRect();
+    const bx = r.left + r.width/2, by = r.top + r.height/2;
+
+    // Dashed animated line
+    ctx.save();
+    ctx.setLineDash([4,8]);
+    ctx.lineDashOffset = -(t/40);
+    ctx.strokeStyle = b.color+'55';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(b.ox,b.oy); ctx.lineTo(bx,by); ctx.stroke();
+
+    // Dot at origin
+    ctx.setLineDash([]);
+    ctx.fillStyle = b.color+'cc';
+    ctx.beginPath(); ctx.arc(b.ox,b.oy,5,0,Math.PI*2); ctx.fill();
+
+    // Expanding ripple
+    const phase = (t%2000)/2000;
+    const rAlpha = Math.floor((1-phase)*160).toString(16).padStart(2,'0');
+    ctx.strokeStyle = b.color+rAlpha;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(b.ox,b.oy,phase*30,0,Math.PI*2); ctx.stroke();
+
+    ctx.restore();
   });
-
-  window.addEventListener('touchend',  () => { resizing = false; });
-  window.addEventListener('mouseup',   () => { resizing = false; });
+  requestAnimationFrame(drawLines);
 }
 
-// ══════════════════════════════════════════
-//  PINCH-TO-ZOOM (two fingers)
-// ══════════════════════════════════════════
-function makePinchable(node) {
-  let initDist = null;
-  let initScale = 1;
-
-  node.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) {
-      initDist = pinchDist(e.touches);
-      initScale = currentScale(node);
-    }
-  }, { passive:true });
-
-  node.addEventListener('touchmove', e => {
-    if (e.touches.length === 2 && initDist) {
-      const dist = pinchDist(e.touches);
-      const s = Math.max(.4, Math.min(3, initScale * (dist / initDist)));
-      setScale(node, s);
-    }
-  }, { passive:true });
-
-  node.addEventListener('touchend', () => { initDist = null; });
+// ══════ DRAG ══════
+function makeDraggable(el, bubble) {
+  let d=false, sx,sy,il,it;
+  const dn = e => {
+    if(e.target.classList.contains('fb-close')) return;
+    d=true; el.classList.add('dragging'); el.style.zIndex=++zTop;
+    const t=e.touches?e.touches[0]:e; sx=t.clientX; sy=t.clientY;
+    il=parseFloat(el.style.left)||0; it=parseFloat(el.style.top)||0;
+    e.preventDefault();
+  };
+  const mv = e => {
+    if(!d) return;
+    const t=e.touches?e.touches[0]:e;
+    el.style.left=(il+t.clientX-sx)+'px'; el.style.top=(it+t.clientY-sy)+'px';
+    if(bubble){bubble.x=parseFloat(el.style.left);bubble.y=parseFloat(el.style.top);}
+    e.preventDefault();
+  };
+  const up = ()=>{ d=false; el.classList.remove('dragging'); };
+  el.addEventListener('touchstart',dn,{passive:false});
+  el.addEventListener('touchmove',mv,{passive:false});
+  el.addEventListener('touchend',up);
+  el.addEventListener('mousedown',dn);
+  window.addEventListener('mousemove',mv);
+  window.addEventListener('mouseup',up);
 }
 
-function pinchDist(touches) {
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
-  return Math.sqrt(dx*dx + dy*dy);
+// ══════ PINCH ══════
+function makePinchable(el) {
+  let id=null, is=1;
+  el.addEventListener('touchstart',e=>{ if(e.touches.length===2){id=dist(e.touches);is=getS(el);} },{passive:true});
+  el.addEventListener('touchmove',e=>{ if(e.touches.length===2&&id){ const s=Math.max(.4,Math.min(3,is*dist(e.touches)/id)); el.style.transform=`scale(${s})`; } },{passive:true});
+  el.addEventListener('touchend',()=>id=null);
+}
+const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+const getS=el=>{ const m=(el.style.transform||'').match(/scale\(([^)]+)\)/); return m?+m[1]:1; };
+
+// ══════ TOOLBAR ══════
+function buildToolbar() {
+  const row = document.getElementById('tb-row');
+  Object.entries(DB).forEach(([key,cat]) => {
+    const btn = document.createElement('div');
+    btn.className='tb-btn'; btn.style.borderColor=cat.color+'30';
+    btn.innerHTML=`<div class="tb-icon">${cat.icon}</div><div class="tb-lbl" style="color:${cat.color}">${cat.label.split('·')[0].trim()}</div>`;
+    btn.addEventListener('pointerdown',()=>{
+      const vw=window.innerWidth,vh=window.innerHeight;
+      const f=cat.formulas[Math.floor(Math.random()*cat.formulas.length)];
+      spawnBubble(f,cat,{x:vw*.15+Math.random()*vw*.55,y:vh*.15+Math.random()*vh*.35},{x:vw*.5,y:vh*.5});
+    });
+    row.appendChild(btn);
+  });
 }
 
-function currentScale(node) {
-  const t = node.style.transform;
-  if (!t || t === 'none') return 1;
-  const m = t.match(/scale\(([^)]+)\)/);
-  return m ? parseFloat(m[1]) : 1;
-}
-
-function setScale(node, s) {
-  const t = node.style.transform.replace(/scale\([^)]+\)/, '').trim();
-  node.style.transform = `${t} scale(${s})`.trim();
-}
-
-// Prevent default scroll on touch to keep AR smooth
-document.addEventListener('touchmove', e => e.preventDefault(), { passive:false });
+document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 </script>
 </body>
 </html>
