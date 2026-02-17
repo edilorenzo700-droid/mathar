@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>MathAR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+:root {
+  --purple: #c4a8ff;
+  --pink:   #ff9fd4;
+  --blue:   #8dd8ff;
+  --gold:   #ffd080;
+  --green:  #80ffcc;
+  --bg:     #08080f;
+  --text:   #f0e8ff;
+  --mono:   'Space Mono', monospace;
+  --sans:   'Syne', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:var(--sans); }
+
+/* ══════════════════════════════
+   CAMERA
+══════════════════════════════ */
+#video {
+  position:fixed; inset:0; width:100%; height:100%;
+  object-fit:cover; z-index:0;
+}
+
+/* ══════════════════════════════
+   SPLASH
+══════════════════════════════ */
+#splash {
+  position:fixed; inset:0; z-index:200;
+  background:var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:1.8rem; padding:2.4rem 2rem;
+  transition: opacity .7s ease, transform .7s ease;
+}
+#splash.exit { opacity:0; transform:scale(1.04); pointer-events:none; }
+
+.s-logo {
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+}
+.s-ring {
+  width:80px; height:80px; border-radius:24px;
+  border:2px solid var(--purple);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.4rem; color:var(--purple);
+  animation:ring-glow 2.8s ease-in-out infinite;
+  background:rgba(196,168,255,.06);
+}
+@keyframes ring-glow {
+  0%,100%{ box-shadow:0 0 20px rgba(196,168,255,.15); }
+  50%    { box-shadow:0 0 50px rgba(196,168,255,.45), 0 0 100px rgba(196,168,255,.1); }
+}
+.s-title {
+  font-size:3rem; font-weight:800; letter-spacing:-2px;
+  background:linear-gradient(130deg,var(--purple) 0%,var(--pink) 55%,var(--blue) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.s-sub {
+  font-family:var(--mono); font-size:.6rem; letter-spacing:4px;
+  color:#5a5070; text-transform:uppercase;
+}
+
+.s-card {
+  width:100%; max-width:360px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(196,168,255,.14);
+  border-radius:20px; padding:1.6rem;
+}
+.s-card-title {
+  font-family:var(--mono); font-size:.58rem; letter-spacing:3px;
+  color:var(--purple); text-transform:uppercase; margin-bottom:1.1rem;
+}
+.s-row {
+  display:flex; align-items:center; gap:1rem;
+  padding:.6rem 0; border-bottom:1px solid rgba(255,255,255,.04);
+}
+.s-row:last-child{ border-bottom:none; }
+.s-icon {
+  width:38px; height:38px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:1.2rem;
+}
+.ic-a{ background:rgba(196,168,255,.12); }
+.ic-b{ background:rgba(255,159,212,.10); }
+.ic-c{ background:rgba(141,216,255,.10); }
+.ic-d{ background:rgba(255,208,128,.10); }
+.s-row-txt{ font-size:.82rem; color:#c0b0d8; line-height:1.45; }
+.s-row-txt strong{ color:var(--text); }
+
+.s-btn {
+  width:100%; max-width:360px;
+  background:linear-gradient(135deg,var(--purple),#9060e8);
+  border:none; border-radius:18px; padding:1.1rem;
+  font-family:var(--sans); font-size:1rem; font-weight:800;
+  color:#08080f; cursor:pointer; letter-spacing:.3px;
+  box-shadow:0 8px 36px rgba(196,168,255,.28);
+  transition:transform .14s, box-shadow .14s;
+}
+.s-btn:active{ transform:scale(.97); box-shadow:0 4px 18px rgba(196,168,255,.18); }
+
+/* ══════════════════════════════
+   AR OVERLAY
+══════════════════════════════ */
+#overlay {
+  position:fixed; inset:0; z-index:10;
+  display:none; pointer-events:none;
+}
+#overlay.active{ display:block; }
+
+/* Canvas for formula rendering */
+#ar-canvas {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  pointer-events:none;
+}
+
+/* Formulas container — each formula is a DOM element for interaction */
+#formulas-layer {
+  position:absolute; inset:0;
+  pointer-events:all;
+}
+
+/* ══════════════════════════════
+   FORMULA NODE
+══════════════════════════════ */
+.fnode {
+  position:absolute;
+  display:flex; flex-direction:column; align-items:flex-start;
+  padding:1rem 1.2rem 0.9rem;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(18px) saturate(1.4);
+  -webkit-backdrop-filter:blur(18px) saturate(1.4);
+  background:rgba(8,8,18,.62);
+  cursor:grab; touch-action:none;
+  transform-origin:center center;
+  transition:box-shadow .2s;
+  will-change:transform;
+  min-width:160px;
+}
+.fnode.dragging{
+  cursor:grabbing;
+  box-shadow:0 24px 60px rgba(0,0,0,.7) !important;
+  z-index:999 !important;
+  transition:none;
+}
+.fnode.scaled-down{ transform:scale(.85); }
+
+.fn-label {
+  font-family:var(--mono); font-size:.52rem;
+  letter-spacing:2.5px; text-transform:uppercase; margin-bottom:.25rem; opacity:.7;
+}
+.fn-name {
+  font-size:.78rem; font-weight:700; margin-bottom:.1rem; color:var(--text);
+}
+.fn-eq {
+  font-family:var(--mono); font-size:1.35rem; font-weight:700;
+  line-height:1.2; margin:.35rem 0;
+}
+.fn-desc {
+  font-size:.7rem; color:#a090c0; line-height:1.5; margin-top:.2rem; max-width:200px;
+}
+
+/* resize handle */
+.fn-handle {
+  position:absolute; bottom:6px; right:8px;
+  font-size:.7rem; opacity:.3; cursor:se-resize; touch-action:none;
+  font-family:var(--mono); color:#fff;
+}
+
+/* close button */
+.fn-close {
+  position:absolute; top:7px; right:10px;
+  font-size:.85rem; opacity:.35; cursor:pointer; color:#fff;
+  width:20px; height:20px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; transition:opacity .2s, background .2s;
+}
+.fn-close:hover{ opacity:1; background:rgba(255,80,80,.25); }
+
+/* glow ring that pulses */
+.fn-ring {
+  position:absolute; inset:-1px; border-radius:18px; pointer-events:none;
+  animation:node-pulse 3s ease-in-out infinite;
+}
+@keyframes node-pulse{
+  0%,100%{ opacity:.4; }
+  50%{ opacity:1; }
+}
+
+/* ══════════════════════════════
+   HUD ELEMENTS
+══════════════════════════════ */
+/* Top bar */
+#hud-top {
+  position:fixed; top:0; left:0; right:0; z-index:50;
+  display:none; align-items:center; justify-content:space-between;
+  padding:.9rem 1.2rem;
+  background:linear-gradient(to bottom, rgba(8,8,18,.75) 0%, transparent 100%);
+  pointer-events:all;
+}
+#hud-top.active{ display:flex; }
+
+.hud-logo {
+  font-family:var(--sans); font-size:1.1rem; font-weight:800;
+  background:linear-gradient(90deg,var(--purple),var(--pink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hud-status {
+  display:flex; align-items:center; gap:.45rem;
+  background:rgba(8,8,18,.7); border:1px solid rgba(196,168,255,.18);
+  border-radius:20px; padding:.28rem .8rem;
+  font-family:var(--mono); font-size:.58rem; color:var(--purple); letter-spacing:1.5px;
+  backdrop-filter:blur(10px);
+}
+.hud-dot {
+  width:6px; height:6px; border-radius:50%; background:#80ffcc;
+  animation:blink 1.8s ease-in-out infinite;
+}
+@keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+/* Bottom toolbar */
+#toolbar {
+  position:fixed; bottom:0; left:0; right:0; z-index:50;
+  display:none;
+  padding:.7rem .9rem 1.4rem;
+  background:linear-gradient(to top, rgba(8,8,18,.92) 55%, transparent 100%);
+  pointer-events:all;
+}
+#toolbar.active{ display:block; }
+
+.tb-label {
+  font-family:var(--mono); font-size:.52rem; letter-spacing:3px;
+  color:#4a4060; text-transform:uppercase; text-align:center; margin-bottom:.6rem;
+}
+.tb-pills {
+  display:flex; gap:.45rem; overflow-x:auto; padding-bottom:.2rem;
+  scrollbar-width:none;
+}
+.tb-pills::-webkit-scrollbar{ display:none; }
+
+.tb-pill {
+  flex-shrink:0;
+  display:flex; flex-direction:column; align-items:center; gap:.3rem;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+  border-radius:14px; padding:.7rem .9rem;
+  cursor:pointer; transition:all .2s;
+  min-width:70px;
+}
+.tb-pill:active{ transform:scale(.94); }
+.tb-pill .tp-icon{ font-size:1.4rem; }
+.tb-pill .tp-name{
+  font-family:var(--mono); font-size:.52rem; color:#7060a0; letter-spacing:.5px;
+  text-align:center; white-space:nowrap;
+}
+
+/* ══════════════════════════════
+   SCAN EFFECT
+══════════════════════════════ */
+.scan-line {
+  position:fixed; left:0; right:0; height:1px; z-index:15;
+  background:linear-gradient(90deg,transparent,rgba(196,168,255,.6),transparent);
+  animation:scan 5s linear infinite; pointer-events:none; display:none;
+}
+.scan-line.active{ display:block; }
+@keyframes scan{ from{top:0} to{top:100vh} }
+
+/* corners */
+.corner{ position:fixed; width:24px; height:24px; z-index:15; pointer-events:none; display:none; }
+.corner.active{ display:block; }
+.corner::before,.corner::after{ content:''; position:absolute; background:rgba(196,168,255,.5); }
+.c-tl{ top:1rem; left:1rem; }
+.c-tl::before{ top:0;left:0;width:2px;height:100%; }
+.c-tl::after{  top:0;left:0;width:100%;height:2px; }
+.c-tr{ top:1rem; right:1rem; }
+.c-tr::before{ top:0;right:0;width:2px;height:100%; }
+.c-tr::after{  top:0;right:0;width:100%;height:2px; }
+.c-bl{ bottom:7rem; left:1rem; }
+.c-bl::before{ bottom:0;left:0;width:2px;height:100%; }
+.c-bl::after{  bottom:0;left:0;width:100%;height:2px; }
+.c-br{ bottom:7rem; right:1rem; }
+.c-br::before{ bottom:0;right:0;width:2px;height:100%; }
+.c-br::after{  bottom:0;right:0;width:100%;height:2px; }
+
+/* ══════════════════════════════
+   PERMISSION ERROR
+══════════════════════════════ */
+#cam-error {
+  position:fixed; inset:0; z-index:300;
+  background:var(--bg); display:none;
+  flex-direction:column; align-items:center; justify-content:center;
+  gap:1.2rem; padding:2rem; text-align:center;
+}
+#cam-error.show{ display:flex; }
+.err-icon{ font-size:3rem; }
+.err-title{ font-size:1.3rem; font-weight:800; color:var(--text); }
+.err-msg{ font-size:.85rem; color:#7060a0; line-height:1.6; max-width:300px; }
+.err-btn {
+  background:rgba(196,168,255,.12); border:1px solid rgba(196,168,255,.3);
+  border-radius:14px; padding:.8rem 1.8rem;
+  font-family:var(--mono); font-size:.75rem; color:var(--purple);
+  cursor:pointer; letter-spacing:1px;
+}
+</style>
+</head>
+<body>
+
+<!-- Camera feed -->
+<video id="video" autoplay playsinline muted></video>
+
+<!-- ══════ SPLASH ══════ -->
+<div id="splash">
+  <div class="s-logo">
+    <div class="s-ring">∑</div>
+    <div class="s-title">MathAR</div>
+    <div class="s-sub">Matematica nella realtà aumentata</div>
+  </div>
+
+  <div class="s-card">
+    <div class="s-card-title">Come funziona</div>
+    <div class="s-row">
+      <div class="s-icon ic-a">📷</div>
+      <div class="s-row-txt"><strong>Fotocamera reale</strong> — vedi il mondo attorno a te con le formule sopra</div>
+    </div>
+    <div class="s-row">
+      <div class="s-icon ic-b">✋</div>
+      <div class="s-row-txt"><strong>Trascina</strong> le formule dove vuoi nello spazio</div>
+    </div>
+    <div class="s-row">
+      <div class="s-icon ic-c">🔍</div>
+      <div class="s-row-txt"><strong>Pizzica</strong> per ingrandire o rimpicciolire</div>
+    </div>
+    <div class="s-row">
+      <div class="s-icon ic-d">➕</div>
+      <div class="s-row-txt"><strong>Aggiungi</strong> nuove formule dal menu in basso</div>
+    </div>
+  </div>
+
+  <button class="s-btn" onclick="startAR()">📷 &nbsp;Avvia Fotocamera</button>
+</div>
+
+<!-- ══════ CAMERA ERROR ══════ -->
+<div id="cam-error">
+  <div class="err-icon">🔒</div>
+  <div class="err-title">Fotocamera non disponibile</div>
+  <div class="err-msg">
+    Il browser ha bloccato l'accesso alla fotocamera.<br><br>
+    Questa app funziona solo su <strong>HTTPS</strong>.<br>
+    Carica il file su <strong>GitHub Pages</strong> (gratuito) per usarla sul telefono.
+  </div>
+  <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem 1.2rem;font-family:var(--mono);font-size:.7rem;color:#9080b0;line-height:1.8;max-width:300px;text-align:left;">
+    <div style="color:var(--purple);margin-bottom:.4rem;">ISTRUZIONI GITHUB PAGES:</div>
+    1. Vai su github.com → New repo<br>
+    2. Carica questo file come index.html<br>
+    3. Settings → Pages → Deploy from main<br>
+    4. Apri il link sul telefono ✓
+  </div>
+  <button class="err-btn" onclick="location.reload()">↻ &nbsp;Riprova</button>
+</div>
+
+<!-- ══════ HUD ══════ -->
+<div id="hud-top">
+  <div class="hud-logo">MathAR</div>
+  <div class="hud-status">
+    <div class="hud-dot"></div>
+    AR LIVE
+  </div>
+</div>
+
+<!-- Scan + corners -->
+<div class="scan-line" id="scan"></div>
+<div class="corner c-tl" id="c1"></div>
+<div class="corner c-tr" id="c2"></div>
+<div class="corner c-bl" id="c3"></div>
+<div class="corner c-br" id="c4"></div>
+
+<!-- ══════ OVERLAY ══════ -->
+<div id="overlay">
+  <div id="formulas-layer"></div>
+</div>
+
+<!-- ══════ TOOLBAR ══════ -->
+<div id="toolbar">
+  <div class="tb-label">+ aggiungi formula</div>
+  <div class="tb-pills" id="tb-pills"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  FORMULA DEFINITIONS
+// ══════════════════════════════════════════
+const FORMULAS = [
+  {
+    id:'trig1', label:'Trigonometria', name:'Identità fondamentale',
+    eq:'sin²x + cos²x = 1',
+    desc:'Vera per qualunque angolo x',
+    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+  },
+  {
+    id:'trig2', label:'Trigonometria', name:'Definizione del seno',
+    eq:'sin x = opp/ip',
+    desc:'Opposto su ipotenusa nel triangolo rettangolo',
+    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+  },
+  {
+    id:'trig3', label:'Trigonometria', name:'Definizione del coseno',
+    eq:'cos x = adj/ip',
+    desc:'Adiacente su ipotenusa',
+    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+  },
+  {
+    id:'pit', label:'Geometria', name:'Teorema di Pitagora',
+    eq:'a² + b² = c²',
+    desc:'Vale in ogni triangolo rettangolo',
+    color:'#ffd080', bg:'rgba(255,180,40,.08)'
+  },
+  {
+    id:'mot1', label:'Cinematica', name:'Velocità finale',
+    eq:'v = v₀ + a·t',
+    desc:'Moto uniformemente accelerato',
+    color:'#8dd8ff', bg:'rgba(60,160,255,.08)'
+  },
+  {
+    id:'mot2', label:'Cinematica', name:'Spazio percorso',
+    eq:'s = v₀t + ½at²',
+    desc:'Distanza in funzione del tempo',
+    color:'#8dd8ff', bg:'rgba(60,160,255,.08)'
+  },
+  {
+    id:'mot3', label:'Cinematica', name:'Teorema delle velocità',
+    eq:'v² = v₀² + 2as',
+    desc:'Senza dipendenza dal tempo',
+    color:'#8dd8ff', bg:'rgba(60,160,255,.08)'
+  },
+  {
+    id:'ein', label:'Relatività', name:'Einstein',
+    eq:'E = mc²',
+    desc:'Energia e massa sono equivalenti',
+    color:'#80ffcc', bg:'rgba(40,255,160,.07)'
+  },
+  {
+    id:'newt', label:'Dinamica', name:'Seconda legge di Newton',
+    eq:'F = m · a',
+    desc:'Forza = massa × accelerazione',
+    color:'#c4a8ff', bg:'rgba(150,100,255,.08)'
+  },
+  {
+    id:'grav', label:'Gravitazione', name:'Legge di gravitazione',
+    eq:'F = G·m₁m₂/r²',
+    desc:'Attrazione tra due masse',
+    color:'#c4a8ff', bg:'rgba(150,100,255,.08)'
+  },
+  {
+    id:'euler', label:'Analisi', name:'Identità di Eulero',
+    eq:'e^(iπ) + 1 = 0',
+    desc:'La più bella equazione della matematica',
+    color:'#ff9fd4', bg:'rgba(255,80,160,.08)'
+  },
+  {
+    id:'quad', label:'Algebra', name:'Formula quadratica',
+    eq:'x = (-b ± √Δ)/2a',
+    desc:'Δ = b² - 4ac',
+    color:'#ffd080', bg:'rgba(255,180,40,.08)'
+  },
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let activeNodes = [];
+let zCounter = 20;
+
+// ══════════════════════════════════════════
+//  START AR
+// ══════════════════════════════════════════
+async function startAR() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1920 }, height: { ideal: 1080 }
+      },
+      audio: false
+    });
+
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    await video.play();
+
+    // Activate UI
+    document.getElementById('splash').classList.add('exit');
+    setTimeout(() => document.getElementById('splash').style.display = 'none', 700);
+
+    document.getElementById('overlay').classList.add('active');
+    document.getElementById('hud-top').classList.add('active');
+    document.getElementById('toolbar').classList.add('active');
+    document.getElementById('scan').classList.add('active');
+    ['c1','c2','c3','c4'].forEach(id => document.getElementById(id).classList.add('active'));
+
+    buildToolbar();
+
+    // Spawn a few starter formulas
+    setTimeout(() => spawnFormula('trig1', .2, .25), 300);
+    setTimeout(() => spawnFormula('pit',   .55, .18), 700);
+    setTimeout(() => spawnFormula('mot1',  .1,  .55), 1100);
+
+  } catch(err) {
+    console.error(err);
+    document.getElementById('cam-error').classList.add('show');
+  }
+}
+
+// ══════════════════════════════════════════
+//  BUILD TOOLBAR
+// ══════════════════════════════════════════
+function buildToolbar() {
+  const pill = document.getElementById('tb-pills');
+  const icons = {
+    'Trigonometria':'📐','Geometria':'△','Cinematica':'⚡',
+    'Relatività':'✨','Dinamica':'💥','Gravitazione':'🌍',
+    'Analisi':'∞','Algebra':'🔣'
+  };
+  FORMULAS.forEach(f => {
+    const el = document.createElement('div');
+    el.className = 'tb-pill';
+    el.style.borderColor = f.color + '33';
+    el.innerHTML = `
+      <div class="tp-icon">${icons[f.label] || '∑'}</div>
+      <div class="tp-name" style="color:${f.color};">${f.name.split(' ').slice(0,2).join(' ')}</div>
+    `;
+    el.addEventListener('pointerdown', () => {
+      // spawn at center with slight random offset
+      spawnFormula(f.id, .3 + Math.random()*.35, .2 + Math.random()*.35);
+    });
+    pill.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════
+//  SPAWN FORMULA NODE
+// ══════════════════════════════════════════
+function spawnFormula(id, relX, relY) {
+  const def = FORMULAS.find(f => f.id === id);
+  if (!def) return;
+
+  const layer = document.getElementById('formulas-layer');
+  const vw = window.innerWidth, vh = window.innerHeight;
+
+  const node = document.createElement('div');
+  node.className = 'fnode';
+  node.style.cssText = `
+    left:${relX * vw}px;
+    top:${relY * vh}px;
+    z-index:${++zCounter};
+    border-color:${def.color}40;
+    background:rgba(8,8,18,.64);
+    box-shadow:0 8px 40px rgba(0,0,0,.55), 0 0 0 1px ${def.color}22, inset 0 1px 0 rgba(255,255,255,.05);
+    animation:node-appear .4s cubic-bezier(.34,1.56,.64,1);
+  `;
+
+  node.innerHTML = `
+    <style>
+      @keyframes node-appear{from{opacity:0;transform:scale(.7) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    </style>
+    <div class="fn-ring" style="border:1px solid ${def.color}30; box-shadow:inset 0 0 20px ${def.color}08;"></div>
+    <div class="fn-close" onclick="removeNode(this.parentNode)">✕</div>
+    <div class="fn-label" style="color:${def.color}bb;">${def.label}</div>
+    <div class="fn-name">${def.name}</div>
+    <div class="fn-eq" style="color:${def.color};">${def.eq}</div>
+    <div class="fn-desc">${def.desc}</div>
+    <div class="fn-handle">⤡</div>
+  `;
+
+  layer.appendChild(node);
+  activeNodes.push(node);
+
+  makeDraggable(node);
+  makePinchable(node);
+
+  return node;
+}
+
+// ══════════════════════════════════════════
+//  REMOVE NODE
+// ══════════════════════════════════════════
+function removeNode(node) {
+  node.style.transition = 'opacity .3s, transform .3s';
+  node.style.opacity = '0';
+  node.style.transform = 'scale(.7)';
+  setTimeout(() => node.remove(), 300);
+  activeNodes = activeNodes.filter(n => n !== node);
+}
+
+// ══════════════════════════════════════════
+//  DRAGGABLE (touch + mouse)
+// ══════════════════════════════════════════
+function makeDraggable(node) {
+  let startX, startY, initLeft, initTop;
+  let dragging = false;
+  const handle = node; // drag from whole card
+
+  function onDown(e) {
+    // Ignore close button and resize handle
+    if (e.target.classList.contains('fn-close')) return;
+    if (e.target.classList.contains('fn-handle')) return;
+
+    dragging = true;
+    node.classList.add('dragging');
+    node.style.zIndex = ++zCounter;
+
+    const touch = e.touches ? e.touches[0] : e;
+    startX = touch.clientX;
+    startY = touch.clientY;
+    initLeft = parseFloat(node.style.left) || 0;
+    initTop  = parseFloat(node.style.top)  || 0;
+
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const touch = e.touches ? e.touches[0] : e;
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    node.style.left = (initLeft + dx) + 'px';
+    node.style.top  = (initTop  + dy) + 'px';
+    e.preventDefault();
+  }
+
+  function onUp() {
+    dragging = false;
+    node.classList.remove('dragging');
+  }
+
+  node.addEventListener('touchstart',  onDown, { passive:false });
+  node.addEventListener('touchmove',   onMove, { passive:false });
+  node.addEventListener('touchend',    onUp);
+  node.addEventListener('mousedown',   onDown);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup',   onUp);
+
+  // Resize handle
+  const rh = node.querySelector('.fn-handle');
+  let resizing = false;
+  let resStartX, resStartScale;
+
+  rh.addEventListener('touchstart', e => {
+    resizing = true;
+    resStartX = e.touches[0].clientX;
+    resStartScale = currentScale(node);
+    e.stopPropagation(); e.preventDefault();
+  }, { passive:false });
+
+  rh.addEventListener('mousedown', e => {
+    resizing = true;
+    resStartX = e.clientX;
+    resStartScale = currentScale(node);
+    e.stopPropagation(); e.preventDefault();
+  });
+
+  window.addEventListener('touchmove', e => {
+    if (!resizing) return;
+    const dx = e.touches[0].clientX - resStartX;
+    const s = Math.max(.5, Math.min(2.5, resStartScale + dx/150));
+    setScale(node, s);
+  }, { passive:false });
+
+  window.addEventListener('mousemove', e => {
+    if (!resizing) return;
+    const dx = e.clientX - resStartX;
+    const s = Math.max(.5, Math.min(2.5, resStartScale + dx/150));
+    setScale(node, s);
+  });
+
+  window.addEventListener('touchend',  () => { resizing = false; });
+  window.addEventListener('mouseup',   () => { resizing = false; });
+}
+
+// ══════════════════════════════════════════
+//  PINCH-TO-ZOOM (two fingers)
+// ══════════════════════════════════════════
+function makePinchable(node) {
+  let initDist = null;
+  let initScale = 1;
+
+  node.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      initDist = pinchDist(e.touches);
+      initScale = currentScale(node);
+    }
+  }, { passive:true });
+
+  node.addEventListener('touchmove', e => {
+    if (e.touches.length === 2 && initDist) {
+      const dist = pinchDist(e.touches);
+      const s = Math.max(.4, Math.min(3, initScale * (dist / initDist)));
+      setScale(node, s);
+    }
+  }, { passive:true });
+
+  node.addEventListener('touchend', () => { initDist = null; });
+}
+
+function pinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+function currentScale(node) {
+  const t = node.style.transform;
+  if (!t || t === 'none') return 1;
+  const m = t.match(/scale\(([^)]+)\)/);
+  return m ? parseFloat(m[1]) : 1;
+}
+
+function setScale(node, s) {
+  const t = node.style.transform.replace(/scale\([^)]+\)/, '').trim();
+  node.style.transform = `${t} scale(${s})`.trim();
+}
+
+// Prevent default scroll on touch to keep AR smooth
+document.addEventListener('touchmove', e => e.preventDefault(), { passive:false });
+</script>
+</body>
+</html>
