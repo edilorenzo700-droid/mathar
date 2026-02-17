@@ -4,519 +4,423 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>MathAR</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 :root {
-  --p: #c4a8ff; --pk: #ff9fd4; --b: #8dd8ff;
-  --g: #80ffcc; --o: #ffd080; --bg: #07070f;
-  --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
+  --glass-bg: rgba(28,24,20,0.72); --glass-border: rgba(255,255,255,0.14);
+  --glass-shine: rgba(255,255,255,0.22); --warm-white: #f5f0ea;
+  --warm-mid: #b8b0a4; --warm-muted: #6e6860;
+  --accent-blue: #4a9eff; --accent-purple: #bf8fff;
+  --accent-warm: #e8c070; --accent-teal: #50d8b0; --accent-rose: #e87090;
+  --shadow-deep: 0 32px 80px rgba(0,0,0,.7),0 8px 24px rgba(0,0,0,.4);
+  --shadow-float: 0 20px 60px rgba(0,0,0,.5),0 4px 16px rgba(0,0,0,.3);
+  --r-card: 22px; --r-pill: 100px; --font: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
 }
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-html,body { width:100%; height:100%; overflow:hidden; background:#000; font-family:var(--sans); }
-
-#video { position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var(--font);}
+#video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
 
 /* SPLASH */
-#splash {
-  position:fixed; inset:0; z-index:300; background:var(--bg);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:1.6rem; padding:2rem; transition:opacity .6s, transform .6s;
-}
-#splash.out { opacity:0; transform:scale(1.04); pointer-events:none; }
-.logo-ring {
-  width:76px; height:76px; border-radius:22px;
-  border:2px solid var(--p); background:rgba(196,168,255,.06);
-  display:flex; align-items:center; justify-content:center;
-  font-size:2.2rem; color:var(--p); animation:glow 2.5s ease-in-out infinite;
-}
-@keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(196,168,255,.15);} 50%{box-shadow:0 0 50px rgba(196,168,255,.5);} }
-.logo-title {
-  font-size:2.8rem; font-weight:800; letter-spacing:-2px;
-  background:linear-gradient(130deg,var(--p),var(--pk),var(--b));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
-.logo-sub { font-family:var(--mono); font-size:.58rem; letter-spacing:4px; color:#5a5070; text-transform:uppercase; }
-.intro-card {
-  width:100%; max-width:340px;
-  background:rgba(255,255,255,.04); border:1px solid rgba(196,168,255,.12);
-  border-radius:18px; padding:1.4rem 1.5rem;
-}
-.ic-title { font-family:var(--mono); font-size:.56rem; letter-spacing:3px; color:var(--p); text-transform:uppercase; margin-bottom:1rem; }
-.ic-row { display:flex; gap:.9rem; align-items:flex-start; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
-.ic-row:last-child { border-bottom:none; }
-.ic-icon { font-size:1.3rem; flex-shrink:0; margin-top:1px; }
-.ic-text { font-size:.8rem; color:#b0a0c8; line-height:1.45; }
-.ic-text strong { color:#f0e8ff; }
-.btn-start {
-  width:100%; max-width:340px;
-  background:linear-gradient(135deg,var(--p),#8858e8);
-  border:none; border-radius:16px; padding:1.05rem;
-  font-family:var(--sans); font-size:1rem; font-weight:800; color:#07070f;
-  cursor:pointer; box-shadow:0 8px 32px rgba(196,168,255,.3); transition:transform .13s;
-}
-.btn-start:active { transform:scale(.97); }
+#splash{position:fixed;inset:0;z-index:500;background:radial-gradient(ellipse at 40% 35%,rgba(45,38,30,1) 0%,rgba(15,12,10,1) 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;transition:opacity .8s,transform .8s;}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none;}
+.sp-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 30%,rgba(191,143,255,.08) 0%,transparent 60%),radial-gradient(circle at 20% 80%,rgba(74,158,255,.06) 0%,transparent 40%);}
+.sp-c{display:flex;flex-direction:column;align-items:center;gap:1.8rem;padding:2.8rem 2rem;width:100%;max-width:380px;position:relative;z-index:1;}
+.sp-ring{width:88px;height:88px;border-radius:28px;background:linear-gradient(145deg,rgba(191,143,255,.2),rgba(74,158,255,.1));border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(191,143,255,.2),var(--shadow-float);position:relative;overflow:hidden;font-size:2.8rem;}
+.sp-ring::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(to bottom,rgba(255,255,255,.12),transparent);border-radius:28px 28px 0 0;}
+.sp-title{font-size:2.4rem;font-weight:700;letter-spacing:-1.2px;color:var(--warm-white);text-align:center;line-height:1.1;}
+.sp-sub{font-size:.9rem;color:var(--warm-mid);text-align:center;line-height:1.5;}
+.sp-feats{width:100%;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-float);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);}
+.sp-feat{display:flex;align-items:center;gap:1rem;padding:.9rem 1.3rem;border-bottom:1px solid rgba(255,255,255,.05);}
+.sp-feat:last-child{border-bottom:none;}
+.sp-fi{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;position:relative;overflow:hidden;}
+.sp-fi::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(to bottom,rgba(255,255,255,.15),transparent);}
+.ic1{background:linear-gradient(145deg,rgba(191,143,255,.3),rgba(120,80,220,.2));}
+.ic2{background:linear-gradient(145deg,rgba(74,158,255,.3),rgba(40,100,200,.2));}
+.ic3{background:linear-gradient(145deg,rgba(80,216,176,.3),rgba(40,160,120,.2));}
+.ic4{background:linear-gradient(145deg,rgba(232,192,112,.3),rgba(180,140,60,.2));}
+.sp-ft{flex:1;}
+.sp-ft-t{font-size:.88rem;font-weight:600;color:var(--warm-white);margin-bottom:.1rem;}
+.sp-ft-d{font-size:.75rem;color:var(--warm-muted);line-height:1.4;}
+.sp-btn{width:100%;background:linear-gradient(145deg,rgba(191,143,255,.35),rgba(120,80,220,.25));border:1px solid rgba(191,143,255,.4);border-radius:var(--r-pill);padding:1rem;font-family:var(--font);font-size:1rem;font-weight:600;color:var(--warm-white);cursor:pointer;letter-spacing:.2px;box-shadow:0 8px 32px rgba(191,143,255,.2),inset 0 1px 0 rgba(255,255,255,.15);transition:transform .14s;position:relative;overflow:hidden;}
+.sp-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(to bottom,rgba(255,255,255,.1),transparent);}
+.sp-btn:active{transform:scale(.97);}
 
 /* HUD */
-#hud {
-  position:fixed; top:0; left:0; right:0; z-index:50;
-  display:none; align-items:center; justify-content:space-between;
-  padding:.85rem 1.1rem;
-  background:linear-gradient(to bottom,rgba(7,7,15,.8) 0%,transparent 100%);
-}
-#hud.on { display:flex; }
-.hud-logo {
-  font-weight:800; font-size:1.05rem;
-  background:linear-gradient(90deg,var(--p),var(--pk));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
-.hud-badge {
-  display:flex; align-items:center; gap:.4rem;
-  background:rgba(7,7,15,.75); border:1px solid rgba(196,168,255,.2);
-  border-radius:20px; padding:.25rem .75rem;
-  font-family:var(--mono); font-size:.56rem; color:var(--p); letter-spacing:1.5px;
-  backdrop-filter:blur(8px); cursor:pointer;
-}
-.live-dot { width:6px; height:6px; border-radius:50%; background:var(--g); animation:blink 1.6s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+#hud{position:fixed;top:0;left:0;right:0;z-index:80;display:none;align-items:center;justify-content:space-between;padding:1rem 1.3rem .6rem;background:linear-gradient(to bottom,rgba(10,8,6,.6) 0%,transparent 100%);pointer-events:none;}
+#hud.on{display:flex;}
+.hud-wm{font-size:1.1rem;font-weight:600;letter-spacing:-.4px;color:var(--warm-white);opacity:.9;}
+.hud-pill{display:flex;align-items:center;gap:.5rem;background:rgba(28,24,20,.75);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-pill);padding:.32rem .9rem;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);pointer-events:all;cursor:pointer;font-size:.68rem;font-weight:500;color:rgba(245,240,234,.85);letter-spacing:.5px;text-transform:uppercase;transition:background .2s;}
+.hud-pill:active{background:rgba(50,40,30,.8);}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--accent-teal);animation:blink 2s ease-in-out infinite;box-shadow:0 0 6px var(--accent-teal);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-/* CANVAS for lines */
-#line-canvas { position:fixed; inset:0; z-index:25; pointer-events:none; }
+/* SCANLINE + CORNERS */
+#scanline{position:fixed;left:0;right:0;height:1px;z-index:15;display:none;background:linear-gradient(90deg,transparent,rgba(245,240,234,.25),transparent);animation:scanmove 7s linear infinite;pointer-events:none;}
+#scanline.on{display:block;}
+@keyframes scanmove{from{top:-1px}to{top:100vh}}
+.corner{position:fixed;width:20px;height:20px;z-index:15;pointer-events:none;display:none;}
+.corner.on{display:block;}
+.corner::before,.corner::after{content:'';position:absolute;background:rgba(245,240,234,.3);}
+.ctL{top:1rem;left:1rem}.ctL::before{top:0;left:0;width:1.5px;height:100%}.ctL::after{top:0;left:0;width:100%;height:1.5px}
+.ctR{top:1rem;right:1rem}.ctR::before{top:0;right:0;width:1.5px;height:100%}.ctR::after{top:0;right:0;width:100%;height:1.5px}
+.cbL{bottom:7rem;left:1rem}.cbL::before{bottom:0;left:0;width:1.5px;height:100%}.cbL::after{bottom:0;left:0;width:100%;height:1.5px}
+.cbR{bottom:7rem;right:1rem}.cbR::before{bottom:0;right:0;width:1.5px;height:100%}.cbR::after{bottom:0;right:0;width:100%;height:1.5px}
 
-/* SCANLINE */
-#scanline { position:fixed; left:0; right:0; height:1px; z-index:20; display:none;
-  background:linear-gradient(90deg,transparent,rgba(196,168,255,.55),transparent);
-  animation:scanmove 5s linear infinite; pointer-events:none; }
-#scanline.on { display:block; }
-@keyframes scanmove { from{top:-1px} to{top:100vh} }
-.corner { position:fixed; width:22px; height:22px; z-index:20; pointer-events:none; display:none; }
-.corner.on { display:block; }
-.corner::before,.corner::after { content:''; position:absolute; background:rgba(196,168,255,.45); }
-.ctL{top:.9rem;left:.9rem} .ctL::before{top:0;left:0;width:2px;height:100%} .ctL::after{top:0;left:0;width:100%;height:2px}
-.ctR{top:.9rem;right:.9rem} .ctR::before{top:0;right:0;width:2px;height:100%} .ctR::after{top:0;right:0;width:100%;height:2px}
-.cbL{bottom:6.5rem;left:.9rem} .cbL::before{bottom:0;left:0;width:2px;height:100%} .cbL::after{bottom:0;left:0;width:100%;height:2px}
-.cbR{bottom:6.5rem;right:.9rem} .cbR::before{bottom:0;right:0;width:2px;height:100%} .cbR::after{bottom:0;right:0;width:100%;height:2px}
+/* CANVAS */
+#line-canvas{position:fixed;inset:0;z-index:20;pointer-events:none;}
 
-/* AI OVERLAY */
-#ai-overlay {
-  position:fixed; inset:0; z-index:200; display:none;
-  flex-direction:column; align-items:center; justify-content:center;
-  background:rgba(7,7,15,.88); gap:1rem; pointer-events:none;
-}
-#ai-overlay.on { display:flex; }
-.ai-ring { width:72px; height:72px; border-radius:50%; border:3px solid transparent;
-  border-top-color:var(--p); border-right-color:var(--pk); animation:spin 1s linear infinite; }
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.ai-text { font-family:var(--mono); font-size:.68rem; color:var(--p); letter-spacing:3px; text-transform:uppercase; }
-.ai-sub { font-size:.75rem; color:#5a5070; }
+/* FORMULA CARD */
+.fcard{position:fixed;z-index:40;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-card);padding:0;backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);box-shadow:var(--shadow-float),inset 0 1px 0 var(--glass-shine);min-width:160px;max-width:210px;cursor:pointer;touch-action:none;animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) forwards;overflow:hidden;transition:box-shadow .25s;}
+.fcard:active{box-shadow:var(--shadow-deep);}
+.fcard.dragging{box-shadow:var(--shadow-deep);z-index:200;transition:none;cursor:grabbing;}
+.fcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);pointer-events:none;z-index:1;}
+@keyframes cardIn{from{opacity:0;transform:scale(.5) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.fc-bar{height:3px;width:100%;border-radius:var(--r-card) var(--r-card) 0 0;}
+.fc-body{padding:.85rem 1rem .8rem;}
+.fc-cat{font-size:.58rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.65;margin-bottom:.25rem;display:flex;align-items:center;gap:.4rem;}
+.fc-name{font-size:.8rem;font-weight:600;color:var(--warm-white);margin-bottom:.15rem;letter-spacing:-.2px;}
+.fc-eq{font-size:1.2rem;font-weight:700;letter-spacing:-.3px;margin:.35rem 0 .2rem;font-variant-numeric:tabular-nums;animation:eqglow 4s ease-in-out infinite;}
+@keyframes eqglow{0%,100%{text-shadow:none;}50%{text-shadow:0 0 20px currentColor;}}
+.fc-hint{font-size:.6rem;font-weight:500;color:rgba(245,240,234,.3);letter-spacing:.5px;margin-top:.4rem;}
+.fc-close{position:absolute;top:8px;right:10px;z-index:10;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;}
+.fc-close:hover{background:rgba(232,112,112,.25);color:#fff;}
 
-/* FORMULA BUBBLE */
-.fbubble {
-  position:fixed; z-index:40;
-  background:rgba(7,7,15,.84); border-radius:16px;
-  padding:.9rem 1.1rem .8rem 1rem;
-  backdrop-filter:blur(22px) saturate(1.5); -webkit-backdrop-filter:blur(22px) saturate(1.5);
-  border:1px solid rgba(255,255,255,.1); max-width:205px; min-width:145px;
-  box-shadow:0 12px 40px rgba(0,0,0,.6);
-  animation:bubIn .45s cubic-bezier(.34,1.56,.64,1) forwards;
-  cursor:grab; touch-action:none;
-}
-.fbubble.dragging { cursor:grabbing; box-shadow:0 20px 60px rgba(0,0,0,.75); transition:none; }
-@keyframes bubIn { from{opacity:0;transform:scale(.6) translateY(8px);} to{opacity:1;transform:scale(1) translateY(0);} }
-.fb-close {
-  position:absolute; top:6px; right:8px; font-size:.75rem; color:#fff;
-  opacity:.3; cursor:pointer; width:18px; height:18px;
-  display:flex; align-items:center; justify-content:center;
-  border-radius:50%; transition:opacity .2s, background .2s;
-}
-.fb-close:hover { opacity:1; background:rgba(255,60,60,.25); }
-.fb-obj { font-family:var(--mono); font-size:.5rem; letter-spacing:2.5px; text-transform:uppercase; opacity:.65; margin-bottom:.2rem; }
-.fb-name { font-size:.72rem; font-weight:700; color:#f0e8ff; margin-bottom:.05rem; }
-.fb-eq { font-family:var(--mono); font-size:1.15rem; font-weight:700; margin:.3rem 0; animation:eqglow 3s ease-in-out infinite; }
-@keyframes eqglow { 0%,100%{text-shadow:none;} 50%{text-shadow:0 0 16px currentColor;} }
-.fb-desc { font-size:.63rem; color:#9080b0; line-height:1.45; }
+/* DETAIL PANEL */
+#det-bd{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;}
+#det-bd.on{display:flex;}
+#det-bd.on #det-panel{animation:panelUp .45s cubic-bezier(.32,1,.6,1) forwards;}
+@keyframes panelUp{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+#det-panel{width:100%;max-width:480px;background:rgba(22,18,14,.93);border:1px solid var(--glass-border);border-radius:28px 28px 0 0;backdrop-filter:blur(50px) saturate(2);-webkit-backdrop-filter:blur(50px) saturate(2);box-shadow:0 -20px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.18);overflow:hidden;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.dp-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);margin:10px auto 0;}
+.dp-hdr{padding:1.2rem 1.4rem 0;display:flex;align-items:flex-start;justify-content:space-between;}
+.dp-cat{font-size:.6rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.55;margin-bottom:.2rem;}
+.dp-title{font-size:1.35rem;font-weight:700;color:var(--warm-white);letter-spacing:-.5px;line-height:1.2;}
+.dp-x{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:rgba(255,255,255,.6);cursor:pointer;transition:background .2s;}
+.dp-x:hover{background:rgba(255,255,255,.15);}
+.dp-eq-blk{margin:1rem 1.4rem;border-radius:16px;padding:1.2rem;text-align:center;position:relative;overflow:hidden;}
+.dp-eq-blk::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);}
+.dp-eq{font-size:1.8rem;font-weight:700;letter-spacing:-.5px;margin-bottom:.4rem;}
+.dp-eq-nm{font-size:.75rem;font-weight:500;opacity:.5;letter-spacing:.3px;}
+.dp-sec{padding:0 1.4rem 1rem;}
+.dp-sec-t{font-size:.62rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--warm-muted);margin-bottom:.7rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.06);}
+.dp-expl{font-size:.88rem;color:var(--warm-mid);line-height:1.65;margin-bottom:1rem;}
+.dp-vars{display:flex;flex-direction:column;gap:.45rem;margin-bottom:.8rem;}
+.dp-var{display:flex;align-items:center;gap:.8rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.6rem .9rem;}
+.dp-v-sym{font-size:1rem;font-weight:700;min-width:24px;text-align:center;font-variant-numeric:tabular-nums;}
+.dp-v-n{font-size:.78rem;font-weight:500;color:var(--warm-white);}
+.dp-v-u{font-size:.65rem;color:var(--warm-muted);margin-top:.05rem;}
+.dp-ex{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:.9rem 1rem;margin-bottom:1rem;}
+.dp-ex-txt{font-size:.82rem;color:var(--warm-mid);line-height:1.55;}
+.dp-acts{display:flex;gap:.6rem;padding:.8rem 1.4rem 1.6rem;}
+.dp-ab{flex:1;padding:.8rem;border-radius:14px;border:none;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:.4rem;transition:transform .13s;position:relative;overflow:hidden;}
+.dp-ab::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(to bottom,rgba(255,255,255,.12),transparent);}
+.dp-ab:active{transform:scale(.96);}
+.dp-save{background:linear-gradient(145deg,rgba(74,158,255,.3),rgba(40,100,200,.2));border:1px solid rgba(74,158,255,.4);color:var(--accent-blue);}
+.dp-share{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--warm-mid);}
+
+/* TOAST */
+#toast{position:fixed;bottom:8rem;left:50%;transform:translateX(-50%) translateY(20px);z-index:600;background:rgba(22,18,14,.92);border:1px solid rgba(255,255,255,.15);border-radius:var(--r-pill);padding:.55rem 1.2rem;font-size:.78rem;font-weight:500;color:var(--warm-white);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:var(--shadow-float);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 /* TOOLBAR */
-#toolbar {
-  position:fixed; bottom:0; left:0; right:0; z-index:50; display:none;
-  padding:.6rem .8rem 1.3rem;
-  background:linear-gradient(to top,rgba(7,7,15,.95) 55%,transparent 100%);
-}
-#toolbar.on { display:block; }
-.tb-hint { font-family:var(--mono); font-size:.5rem; letter-spacing:2.5px; color:#3a3050; text-transform:uppercase; text-align:center; margin-bottom:.5rem; }
-.tb-row { display:flex; gap:.4rem; overflow-x:auto; scrollbar-width:none; }
-.tb-row::-webkit-scrollbar{display:none;}
-.tb-btn {
-  flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:.28rem;
-  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07);
-  border-radius:13px; padding:.6rem .8rem; cursor:pointer; transition:all .18s; min-width:65px;
-}
-.tb-btn:active { transform:scale(.93); }
-.tb-icon { font-size:1.3rem; }
-.tb-lbl { font-family:var(--mono); font-size:.48rem; letter-spacing:.5px; color:#6050a0; text-align:center; white-space:nowrap; }
+#toolbar{position:fixed;bottom:0;left:0;right:0;z-index:80;display:none;padding:.6rem .8rem 1.4rem;background:linear-gradient(to top,rgba(10,8,6,.9) 50%,transparent);}
+#toolbar.on{display:block;}
+.tb-h{font-size:.55rem;font-weight:500;letter-spacing:2.5px;color:rgba(110,104,96,.8);text-transform:uppercase;text-align:center;margin-bottom:.55rem;}
+.tb-r{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.tb-r::-webkit-scrollbar{display:none;}
+.tb-i{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.3rem;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:16px;padding:.6rem .75rem;cursor:pointer;min-width:64px;transition:all .18s;box-shadow:0 4px 16px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);position:relative;overflow:hidden;}
+.tb-i::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(to bottom,rgba(255,255,255,.06),transparent);}
+.tb-i:active{transform:scale(.93);background:rgba(40,34,26,.8);}
+.tb-ico{font-size:1.3rem;position:relative;z-index:1;}
+.tb-lbl{font-size:.5rem;font-weight:500;color:var(--warm-muted);text-align:center;white-space:nowrap;position:relative;z-index:1;letter-spacing:.3px;}
+
+/* AI OVERLAY */
+#ai-ov{position:fixed;inset:0;z-index:400;background:rgba(10,8,6,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;pointer-events:none;}
+#ai-ov.on{display:flex;}
+.ai-sp{width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.1);border-top-color:rgba(191,143,255,.8);border-right-color:rgba(74,158,255,.5);animation:spin 1s linear infinite;}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.ai-lb{font-size:.75rem;font-weight:500;color:rgba(245,240,234,.6);letter-spacing:2px;text-transform:uppercase;}
 
 /* ERROR */
-#err { position:fixed; inset:0; z-index:400; background:var(--bg); display:none;
-  flex-direction:column; align-items:center; justify-content:center; gap:1rem; padding:2rem; text-align:center; }
-#err.on { display:flex; }
-.err-icon{font-size:3rem} .err-title{font-size:1.2rem;font-weight:800;color:#f0e8ff}
-.err-msg{font-size:.8rem;color:#7060a0;line-height:1.65;max-width:300px}
-.err-code{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.9rem 1.1rem;font-family:var(--mono);font-size:.65rem;color:#9080b0;line-height:1.8;max-width:300px;text-align:left;}
-.err-btn{background:rgba(196,168,255,.1);border:1px solid rgba(196,168,255,.25);border-radius:12px;padding:.7rem 1.6rem;font-family:var(--mono);font-size:.7rem;color:var(--p);cursor:pointer;letter-spacing:1px;}
+#err{position:fixed;inset:0;z-index:600;background:rgba(10,8,6,.98);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;padding:2.5rem 2rem;text-align:center;}
+#err.on{display:flex;}
+.e-ico{font-size:3rem;}.e-t{font-size:1.3rem;font-weight:700;color:var(--warm-white);letter-spacing:-.5px;}
+.e-m{font-size:.82rem;color:var(--warm-muted);line-height:1.6;max-width:290px;}
+.e-lnk{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:14px;padding:.9rem 1.2rem;font-size:.72rem;color:var(--accent-blue);letter-spacing:.3px;text-align:left;max-width:290px;width:100%;line-height:1.7;}
+.e-btn{background:linear-gradient(145deg,rgba(191,143,255,.25),rgba(120,80,220,.15));border:1px solid rgba(191,143,255,.35);border-radius:var(--r-pill);padding:.75rem 2rem;font-family:var(--font);font-size:.82rem;font-weight:600;color:var(--warm-white);cursor:pointer;}
 </style>
 </head>
 <body>
-
 <video id="video" autoplay playsinline muted></video>
 <canvas id="line-canvas"></canvas>
 
-<!-- SPLASH -->
 <div id="splash">
-  <div style="display:flex;flex-direction:column;align-items:center;gap:.45rem">
-    <div class="logo-ring">∑</div>
-    <div class="logo-title">MathAR</div>
-    <div class="logo-sub">AI · Fotocamera · Formule Vive</div>
+  <div class="sp-bg"></div>
+  <div class="sp-c">
+    <div class="sp-ring">∑</div>
+    <div><div class="sp-title">MathAR</div><div class="sp-sub">La matematica prende vita<br>nella realtà che ti circonda</div></div>
+    <div class="sp-feats">
+      <div class="sp-feat"><div class="sp-fi ic1">🤖</div><div class="sp-ft"><div class="sp-ft-t">AI riconosce la scena</div><div class="sp-ft-d">Analisi intelligente degli oggetti nella stanza</div></div></div>
+      <div class="sp-feat"><div class="sp-fi ic2">✨</div><div class="sp-ft"><div class="sp-ft-t">Formule contestuali</div><div class="sp-ft-d">Ogni oggetto genera le formule fisiche correlate</div></div></div>
+      <div class="sp-feat"><div class="sp-fi ic3">👆</div><div class="sp-ft"><div class="sp-ft-t">Tocca per approfondire</div><div class="sp-ft-d">Scheda dettagliata con variabili ed esempi reali</div></div></div>
+      <div class="sp-feat"><div class="sp-fi ic4">🔖</div><div class="sp-ft"><div class="sp-ft-t">Salva le preferite</div><div class="sp-ft-d">Costruisci la tua raccolta di formule</div></div></div>
+    </div>
+    <button class="sp-btn" onclick="startAR()">Avvia fotocamera</button>
   </div>
-  <div class="intro-card">
-    <div class="ic-title">Come funziona</div>
-    <div class="ic-row"><div class="ic-icon">🤖</div><div class="ic-text"><strong>L'AI analizza</strong> la scena inquadrata e riconosce gli oggetti</div></div>
-    <div class="ic-row"><div class="ic-icon">✨</div><div class="ic-text"><strong>Le formule appaiono</strong> collegate all'oggetto con una linea animata</div></div>
-    <div class="ic-row"><div class="ic-icon">✋</div><div class="ic-text"><strong>Trascina e pizzica</strong> le formule dove vuoi</div></div>
-    <div class="ic-row"><div class="ic-icon">🔁</div><div class="ic-text"><strong>Tocca "SCANSIONA"</strong> per analizzare di nuovo la scena</div></div>
-  </div>
-  <button class="btn-start" onclick="startAR()">📷 &nbsp;Avvia MathAR</button>
 </div>
 
-<!-- ERROR -->
 <div id="err">
-  <div class="err-icon">🔒</div>
-  <div class="err-title">Fotocamera bloccata</div>
-  <div class="err-msg">Apri questo link dal tuo telefono tramite GitHub Pages (HTTPS):</div>
-  <div class="err-code"><span style="color:var(--p)">IL TUO LINK:</span><br>edilorenzo700-droid<br>.github.io/mathar</div>
-  <button class="err-btn" onclick="location.reload()">↻ Riprova</button>
+  <div class="e-ico">🔒</div><div class="e-t">Fotocamera bloccata</div>
+  <div class="e-m">Apri questa app tramite il link GitHub Pages su HTTPS:</div>
+  <div class="e-lnk"><span style="color:var(--warm-muted);font-size:.62rem;letter-spacing:2px;">IL TUO LINK</span><br><span style="color:var(--accent-blue);">edilorenzo700-droid.github.io/mathar</span></div>
+  <button class="e-btn" onclick="location.reload()">↻ Riprova</button>
 </div>
 
-<!-- HUD -->
 <div id="hud">
-  <div class="hud-logo">MathAR</div>
-  <div class="hud-badge" onclick="triggerAIScan()">
-    <div class="live-dot"></div>
-    <span id="hud-txt">SCANSIONA</span>
-  </div>
+  <div class="hud-wm">MathAR</div>
+  <div class="hud-pill" onclick="triggerScan()"><div class="ldot"></div><span id="hud-lbl">Scansiona</span></div>
 </div>
-
-<!-- AI overlay -->
-<div id="ai-overlay">
-  <div class="ai-ring"></div>
-  <div class="ai-text">ANALISI AI</div>
-  <div class="ai-sub" id="ai-sub">Riconosco gli oggetti...</div>
-</div>
-
-<!-- Corners + scanline -->
+<div id="ai-ov"><div class="ai-sp"></div><div class="ai-lb" id="ai-lbl">Analisi in corso</div></div>
 <div id="scanline"></div>
 <div class="corner ctL on"></div><div class="corner ctR on"></div>
 <div class="corner cbL on"></div><div class="corner cbR on"></div>
 
-<!-- TOOLBAR -->
+<div id="det-bd" onclick="closeDet(event)">
+  <div id="det-panel">
+    <div class="dp-handle"></div>
+    <div class="dp-hdr">
+      <div><div class="dp-cat" id="dp-cat"></div><div class="dp-title" id="dp-title"></div></div>
+      <div class="dp-x" onclick="closeDet()">✕</div>
+    </div>
+    <div class="dp-eq-blk" id="dp-eqb"><div class="dp-eq" id="dp-eq"></div><div class="dp-eq-nm" id="dp-eqn"></div></div>
+    <div class="dp-sec"><div class="dp-sec-t">Spiegazione</div><div class="dp-expl" id="dp-expl"></div></div>
+    <div class="dp-sec"><div class="dp-sec-t">Variabili</div><div class="dp-vars" id="dp-vars"></div></div>
+    <div class="dp-sec"><div class="dp-sec-t">Esempio pratico</div><div class="dp-ex"><div class="dp-ex-txt" id="dp-ex"></div></div></div>
+    <div class="dp-acts">
+      <button class="dp-ab dp-save" onclick="saveF()">🔖 Salva formula</button>
+      <button class="dp-ab dp-share" onclick="shareF()">↑ Condividi</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
 <div id="toolbar">
-  <div class="tb-hint">+ aggiungi formula manualmente</div>
-  <div class="tb-row" id="tb-row"></div>
+  <div class="tb-h">Aggiungi formula</div>
+  <div class="tb-r" id="tb-r"></div>
 </div>
 
 <script>
-// ══════ DATABASE ══════
-const DB = {
-  lamp: { icon:'💡', label:'Lampada · Luce', color:'#ffd080', objects:['lamp','light','bulb','chandelier','ceiling light','lantern','spotlight'],
+const DB={
+  light:{icon:'💡',label:'Luce & Ottica',color:'#ffd080',bg:'linear-gradient(145deg,rgba(255,208,128,.15),rgba(180,140,60,.08))',
+    objects:['lamp','light','bulb','chandelier','lantern','spotlight','torch','candle'],
     formulas:[
-      { name:'Intensità luminosa', eq:'I = P / 4πr²', desc:'Diminuisce col quadrato della distanza' },
-      { name:'Velocità della luce', eq:'c = λ · f', desc:'Lunghezza d\'onda × frequenza' },
-      { name:'Legge di Snell', eq:'n₁sinθ₁=n₂sinθ₂', desc:'Rifrazione tra due mezzi' },
-    ]
-  },
-  window_: { icon:'🪟', label:'Finestra · Vetro', color:'#8dd8ff', objects:['window','glass','door','frame','curtain','opening'],
+      {name:'Legge di Snell-Descartes',eq:'n₁·sinθ₁ = n₂·sinθ₂',cat:'Ottica — Rifrazione',
+       expl:'Quando la luce passa tra due mezzi, cambia direzione. Il prodotto indice×seno si conserva. Base di lenti, occhiali, fibre ottiche.',
+       vars:[{s:'n₁',n:'Indice rifrazione mezzo 1',u:'adimensionale (aria=1, vetro≈1.5)'},{s:'θ₁',n:'Angolo di incidenza',u:'gradi rispetto alla normale'},{s:'n₂',n:'Indice rifrazione mezzo 2',u:'adimensionale'},{s:'θ₂',n:'Angolo di rifrazione',u:'gradi rispetto alla normale'}],
+       ex:'Luce dall\'aria (n=1) nel vetro (n=1.5) con θ₁=30°: sinθ₂ = sin30°/1.5 = 0.5/1.5 = 0.333 → θ₂ ≈ 19.5°. La luce si piega verso la normale.'},
+      {name:'Illuminamento da sorgente puntiforme',eq:'E = Φ / (4π·r²)',cat:'Fotometria',
+       expl:'L\'illuminamento cala con il quadrato della distanza. Raddoppiare la distanza riduce la luce a 1/4. Usato per progettare l\'illuminazione.',
+       vars:[{s:'E',n:'Illuminamento',u:'lux (lm/m²)'},{s:'Φ',n:'Flusso luminoso totale',u:'lumen (lm)'},{s:'r',n:'Distanza dalla sorgente',u:'metri'}],
+       ex:'Lampadina 800 lm a 1 m: E = 800/(4π) ≈ 63.7 lux. A 2 m: E ≈ 15.9 lux. Raddoppiata la distanza → luce divisa per 4.'},
+    ]},
+  glass:{icon:'🪟',label:'Vetro & Onde',color:'#8dd8ff',bg:'linear-gradient(145deg,rgba(141,216,255,.12),rgba(60,140,200,.07))',
+    objects:['window','glass','mirror','lens','prism','crystal','frame','door'],
     formulas:[
-      { name:'Indice di rifrazione', eq:'n = c / v', desc:'Rapporto velocità luce/vetro' },
-      { name:'Angolo critico', eq:'θ_c = arcsin(1/n)', desc:'Oltre: riflessione totale interna' },
-      { name:'Trasmittanza', eq:'T = I_t / I₀', desc:'Frazione di luce trasmessa' },
-    ]
-  },
-  table: { icon:'🪑', label:'Superficie', color:'#80ffcc', objects:['table','desk','chair','floor','surface','furniture','sofa','couch','shelf','bookshelf','counter','bench'],
+      {name:'Indice di rifrazione',eq:'n = c / v',cat:'Ottica',
+       expl:'Misura quanto la luce rallenta in un mezzo. Per il vetro n≈1.5, per il diamante n=2.42. Un indice maggiore significa luce più lenta.',
+       vars:[{s:'n',n:'Indice di rifrazione',u:'adimensionale (sempre ≥ 1)'},{s:'c',n:'Velocità luce nel vuoto',u:'2.998 × 10⁸ m/s'},{s:'v',n:'Velocità della luce nel mezzo',u:'m/s'}],
+       ex:'Vetro: n=1.5 → v = c/1.5 = 2×10⁸ m/s. Diamante: n=2.42 → v = c/2.42 ≈ 1.24×10⁸ m/s. La luce rallenta!'},
+      {name:'Angolo critico (riflessione totale)',eq:'θc = arcsin(n₂/n₁)',cat:'Ottica',
+       expl:'Oltre questo angolo, la luce non esce dal mezzo denso: si riflette completamente. Principio alla base delle fibre ottiche.',
+       vars:[{s:'θc',n:'Angolo critico',u:'gradi'},{s:'n₁',n:'Mezzo più denso (es. vetro)',u:'n₁ > n₂'},{s:'n₂',n:'Mezzo meno denso (es. aria)',u:'n₂ = 1 per aria'}],
+       ex:'Vetro (n₁=1.5) → aria (n₂=1): θc = arcsin(1/1.5) ≈ 41.8°. Luce con angolo > 41.8° rimbalza interamente nel vetro.'},
+    ]},
+  surface:{icon:'📐',label:'Geometria & Fisica',color:'#80ffcc',bg:'linear-gradient(145deg,rgba(128,255,204,.1),rgba(40,160,120,.07))',
+    objects:['table','desk','floor','surface','shelf','counter','bench','board','wall','ceiling','ground'],
     formulas:[
-      { name:'Area rettangolo', eq:'A = b × h', desc:'Base × altezza' },
-      { name:'Forza d\'attrito', eq:'f = μ · N', desc:'μ = coeff. attrito statico/dinamico' },
-      { name:'Pressione', eq:'P = F / A', desc:'Forza distribuita su area' },
-    ]
-  },
-  person: { icon:'🧑', label:'Corpo umano', color:'#ff9fd4', objects:['person','man','woman','human','face','body','people','student','teacher','hand'],
+      {name:'Teorema di Pitagora',eq:'c² = a² + b²',cat:'Geometria euclidea',
+       expl:'In ogni triangolo rettangolo, il quadrato dell\'ipotenusa è uguale alla somma dei quadrati dei due cateti. Dimostrato 2500 anni fa, ancora usato ogni giorno.',
+       vars:[{s:'c',n:'Ipotenusa (lato opposto all\'angolo retto)',u:'qualsiasi unità di lunghezza'},{s:'a',n:'Primo cateto',u:'stessa unità di c'},{s:'b',n:'Secondo cateto',u:'stessa unità di c'}],
+       ex:'Tavolo 3m × 4m: diagonale = √(3²+4²) = √(9+16) = √25 = 5 m. La tripletta (3,4,5) è la più nota. Altre: (5,12,13), (8,15,17).'},
+      {name:'Forza di attrito',eq:'f = μ · N',cat:'Dinamica',
+       expl:'La forza che si oppone allo scorrimento tra superfici. μ dipende dai materiali: gomma/asfalto≈0.7, legno/legno≈0.3, ghiaccio/ghiaccio≈0.03.',
+       vars:[{s:'f',n:'Forza di attrito',u:'N (Newton)'},{s:'μ',n:'Coefficiente di attrito',u:'adimensionale (0.01 – 0.9)'},{s:'N',n:'Forza normale (perp. alla superficie)',u:'N (Newton)'}],
+       ex:'Libro 1 kg (N=9.8N) su legno (μ=0.3): f = 0.3 × 9.8 = 2.94 N. Serve questa forza minima per farlo scivolare.'},
+      {name:'Pressione',eq:'P = F / A',cat:'Fisica',
+       expl:'La pressione misura come una forza si distribuisce su un\'area. Stessa forza su area minore = pressione maggiore. Per questo i chiodi hanno la punta.',
+       vars:[{s:'P',n:'Pressione',u:'Pa = Pascal = N/m²'},{s:'F',n:'Forza applicata',u:'N (Newton)'},{s:'A',n:'Area su cui agisce la forza',u:'m²'}],
+       ex:'Libro 2 kg (F=19.6N) su base 20×30 cm (A=0.06 m²): P = 19.6/0.06 ≈ 327 Pa. Pressione atmosferica = 101325 Pa per confronto.'},
+    ]},
+  person:{icon:'🧑',label:'Biomeccanica',color:'#ff9fd4',bg:'linear-gradient(145deg,rgba(255,159,212,.1),rgba(200,60,100,.07))',
+    objects:['person','man','woman','human','face','body','people','student','teacher','figure','child'],
     formulas:[
-      { name:'II Legge di Newton', eq:'F = m · a', desc:'Forza = massa × accelerazione' },
-      { name:'Energia cinetica', eq:'Eₖ = ½mv²', desc:'Energia del corpo in movimento' },
-      { name:'Momento angolare', eq:'L = I · ω', desc:'Inerzia × velocità angolare' },
-    ]
-  },
-  book: { icon:'📚', label:'Libro · Schermo', color:'#c4a8ff', objects:['book','notebook','paper','laptop','computer','screen','monitor','keyboard','tablet','phone'],
+      {name:'Seconda legge di Newton',eq:'F = m · a',cat:'Dinamica newtoniana',
+       expl:'La forza risultante su un corpo determina la sua accelerazione. Più è grande la massa, più forza serve per la stessa accelerazione. Base di tutta la meccanica classica.',
+       vars:[{s:'F',n:'Forza risultante',u:'N (Newton)'},{s:'m',n:'Massa del corpo',u:'kg'},{s:'a',n:'Accelerazione',u:'m/s²'}],
+       ex:'Persona 70 kg accelera a 2 m/s²: F = 70 × 2 = 140 N. Stessa forza su 35 kg: a = 140/35 = 4 m/s² (doppia accelerazione).'},
+      {name:'Energia cinetica',eq:'Eₖ = ½ · m · v²',cat:'Energia',
+       expl:'L\'energia posseduta da un corpo in movimento. Cresce con il quadrato della velocità: raddoppiare v quadruplica Eₖ. Per questo in auto la velocità è pericolosa.',
+       vars:[{s:'Eₖ',n:'Energia cinetica',u:'J (Joule)'},{s:'m',n:'Massa',u:'kg'},{s:'v',n:'Velocità',u:'m/s'}],
+       ex:'Persona 70 kg a 1.4 m/s (passo): Eₖ = ½×70×1.96 = 68.6 J. In auto a 50 km/h (13.9 m/s): Eₖ = ½×1200×193 ≈ 115,700 J — 1686 volte di più!'},
+    ]},
+  book:{icon:'📚',label:'Matematica Pura',color:'#c4a8ff',bg:'linear-gradient(145deg,rgba(196,168,255,.12),rgba(120,80,220,.07))',
+    objects:['book','notebook','paper','laptop','computer','screen','monitor','keyboard','tablet','phone','magazine'],
     formulas:[
-      { name:'Identità di Eulero', eq:'e^(iπ)+1=0', desc:'La più bella formula della matematica' },
-      { name:'Formula quadratica', eq:'x=(-b±√Δ)/2a', desc:'Δ = b² − 4ac' },
-      { name:'Derivata', eq:'f\'(x)=lim[f(x+h)-f(x)]/h', desc:'h→0: tasso di variazione istantaneo' },
-    ]
-  },
-  wall: { icon:'🧱', label:'Muro · Spazio', color:'#ffd080', objects:['wall','ceiling','floor','building','room','corner','architecture','brick'],
+      {name:'Identità di Eulero',eq:'eⁱᵖ + 1 = 0',cat:'Analisi complessa',
+       expl:'Considerata la più bella equazione della matematica: unisce e (crescita), i (immaginario), π (geometria), 1 (identità) e 0 (nulla) in una sola relazione.',
+       vars:[{s:'e',n:'Numero di Nepero',u:'≈ 2.71828... (base logaritmo naturale)'},{s:'i',n:'Unità immaginaria',u:'i² = −1'},{s:'π',n:'Pi greco',u:'≈ 3.14159... (rapporto circonf./diametro)'}],
+       ex:'Dalla formula di Euler: e^(iθ) = cosθ + i·sinθ. Per θ=π: e^(iπ) = cos π + i·sin π = −1 + 0·i = −1. Quindi e^(iπ) + 1 = 0. ∎'},
+      {name:'Formula quadratica',eq:'x = (−b ± √Δ) / 2a',cat:'Algebra — Equazioni 2° grado',
+       expl:'Soluzione generale di ax²+bx+c=0. Il discriminante Δ=b²−4ac dice quante soluzioni reali esistono: Δ>0 due, Δ=0 una, Δ<0 nessuna (complesse).',
+       vars:[{s:'a,b,c',n:'Coefficienti (a ≠ 0)',u:'numeri reali'},{s:'Δ',n:'Discriminante = b²−4ac',u:'Δ>0: 2 sol. | Δ=0: 1 sol. | Δ<0: 0 sol. reali'},{s:'x',n:'Soluzioni (radici)',u:'numeri reali o complessi'}],
+       ex:'x²−5x+6=0 → a=1,b=−5,c=6. Δ=25−24=1. x=(5±1)/2 → x₁=3, x₂=2. Verifica: (3)²−5(3)+6 = 9−15+6 = 0 ✓'},
+    ]},
+  sky:{icon:'🌤',label:'Termodinamica',color:'#8dd8ff',bg:'linear-gradient(145deg,rgba(141,216,255,.1),rgba(60,140,220,.07))',
+    objects:['sky','cloud','outdoor','outside','tree','plant','nature','atmosphere','air','wind'],
     formulas:[
-      { name:'Teorema di Pitagora', eq:'a² + b² = c²', desc:'Triangolo rettangolo' },
-      { name:'Teorema di Tales', eq:'AB/DE = BC/EF', desc:'Triangoli simili: lati proporzionali' },
-      { name:'Area triangolo', eq:'A = ½ · b · h', desc:'Base × altezza / 2' },
-    ]
-  },
-  sky: { icon:'🌤', label:'Cielo · Aria', color:'#8dd8ff', objects:['sky','cloud','outdoor','outside','tree','plant','nature','window','atmosphere'],
+      {name:'Legge dei gas ideali',eq:'P·V = n·R·T',cat:'Termodinamica',
+       expl:'Descrive il comportamento dei gas: pressione, volume e temperatura sono legati. Riscaldare un gas → si espande o aumenta la pressione.',
+       vars:[{s:'P',n:'Pressione',u:'Pa (Pascal)'},{s:'V',n:'Volume',u:'m³'},{s:'n',n:'Numero di moli',u:'mol'},{s:'R',n:'Costante universale dei gas',u:'8.314 J/(mol·K)'},{s:'T',n:'Temperatura assoluta',u:'K = °C + 273.15'}],
+       ex:'1 mole d\'aria a 25°C (298 K) a pressione atm: V = nRT/P = 1×8.314×298/101325 ≈ 0.0244 m³ = 24.4 litri. È il "volume molare".'},
+      {name:'Primo principio termodinamica',eq:'ΔU = Q − W',cat:'Termodinamica',
+       expl:'L\'energia interna cambia per il calore assorbito meno il lavoro compiuto. L\'energia totale si conserva: non si crea né si distrugge.',
+       vars:[{s:'ΔU',n:'Variazione di energia interna',u:'J (Joule)'},{s:'Q',n:'Calore assorbito dal sistema',u:'J (positivo = assorbito)'},{s:'W',n:'Lavoro compiuto dal sistema',u:'J (positivo = compiuto)'}],
+       ex:'Gas assorbe Q=500 J e compie lavoro W=200 J: ΔU = 500−200 = 300 J. L\'energia interna (temperatura) aumenta.'},
+    ]},
+  default:{icon:'✨',label:'Fisica Universale',color:'#bf8fff',bg:'linear-gradient(145deg,rgba(191,143,255,.12),rgba(120,80,220,.07))',
+    objects:[],
     formulas:[
-      { name:'Gas perfetti', eq:'PV = nRT', desc:'Pressione, volume, temperatura, moli' },
-      { name:'Velocità del suono', eq:'v = √(γRT/M)', desc:'Dipende da T e composizione' },
-      { name:'Pressione atm.', eq:'P = ρ·g·h', desc:'Colonna d\'aria sovrastante' },
-    ]
-  },
-  default: { icon:'✨', label:'Fenomeno fisico', color:'#c4a8ff', objects:[],
-    formulas:[
-      { name:'Einstein', eq:'E = mc²', desc:'Energia e massa equivalenti' },
-      { name:'Gravitazione', eq:'F=Gm₁m₂/r²', desc:'Attrazione universale tra masse' },
-      { name:'Equazione d\'onda', eq:'∂²y/∂t²=v²∂²y/∂x²', desc:'Propagazione di onde' },
-    ]
-  }
+      {name:'Equazione di Einstein',eq:'E = m · c²',cat:'Relatività ristretta',
+       expl:'La massa è energia concentrata. È alla base del funzionamento del Sole, delle stelle e dell\'energia nucleare. Un grammo di materia = energia enorme.',
+       vars:[{s:'E',n:'Energia',u:'J (Joule)'},{s:'m',n:'Massa a riposo',u:'kg'},{s:'c',n:'Velocità della luce nel vuoto',u:'2.998 × 10⁸ m/s'}],
+       ex:'1 kg di materia: E = 1 × (3×10⁸)² = 9×10¹⁶ J ≈ 21.5 milioni di tonnellate di TNT. Il Sole brucia 4 milioni di tonnellate di massa al secondo.'},
+      {name:'Gravitazione universale',eq:'F = G·m₁·m₂ / r²',cat:'Meccanica celeste',
+       expl:'Ogni coppia di masse si attrae. La forza cala con r². Spiega orbite dei pianeti, maree, caduta dei gravi — dalla mela di Newton alle galassie.',
+       vars:[{s:'F',n:'Forza gravitazionale',u:'N (Newton)'},{s:'G',n:'Costante gravitaz. universale',u:'6.674 × 10⁻¹¹ N·m²/kg²'},{s:'m₁,m₂',n:'Masse dei due corpi',u:'kg'},{s:'r',n:'Distanza tra i centri di massa',u:'m'}],
+       ex:'Terra (5.97×10²⁴ kg) + persona 70 kg a 6.37×10⁶ m: F = 6.67×10⁻¹¹ × 5.97×10²⁴ × 70 / (6.37×10⁶)² ≈ 686 N. È esattamente il tuo peso!'},
+    ]}
 };
 
-// ══════ STATE ══════
-let bubbles = [], zTop = 30;
-const canvas = document.getElementById('line-canvas');
-const ctx = canvas.getContext('2d');
+let bubbles=[],zTop=30,curDet=null,saved=[];
+const canvas=document.getElementById('line-canvas');
+const ctx=canvas.getContext('2d');
+function rsz(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener('resize',rsz);rsz();
 
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// ══════ START AR ══════
-async function startAR() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } },
-      audio:false
-    });
-    const vid = document.getElementById('video');
-    vid.srcObject = stream;
-    vid.style.transform = 'none';
-    await vid.play();
-
+async function startAR(){
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    const v=document.getElementById('video');v.srcObject=s;v.style.transform='none';await v.play();
     document.getElementById('splash').classList.add('out');
-    setTimeout(() => document.getElementById('splash').style.display='none', 650);
+    setTimeout(()=>document.getElementById('splash').style.display='none',800);
     document.getElementById('hud').classList.add('on');
     document.getElementById('toolbar').classList.add('on');
     document.getElementById('scanline').classList.add('on');
-
-    buildToolbar();
-    drawLines();
-    setTimeout(triggerAIScan, 1200);
-  } catch(e) {
-    console.error(e);
-    document.getElementById('err').classList.add('on');
-  }
+    buildTB();drawLines();setTimeout(triggerScan,1500);
+  }catch(e){console.error(e);document.getElementById('err').classList.add('on');}
 }
 
-// ══════ AI SCAN ══════
-async function triggerAIScan() {
-  const ov = document.getElementById('ai-overlay');
-  const sub = document.getElementById('ai-sub');
-  ov.classList.add('on');
-  ov.style.pointerEvents = 'all';
-  sub.textContent = 'Scatto il fotogramma...';
-  document.getElementById('hud-txt').textContent = 'ANALISI...';
-
-  const vid = document.getElementById('video');
-  const snap = document.createElement('canvas');
-  snap.width = Math.min(vid.videoWidth || 640, 640);
-  snap.height = Math.min(vid.videoHeight || 480, 480);
-  snap.getContext('2d').drawImage(vid, 0, 0, snap.width, snap.height);
-  const b64 = snap.toDataURL('image/jpeg', 0.75).split(',')[1];
-
-  sub.textContent = 'AI in analisi...';
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:200,
-        messages:[{
-          role:'user',
-          content:[
-            { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:b64 } },
-            { type:'text', text:'List ONLY the main objects you see in this room image. Reply with ONLY a comma-separated list of object names in English (max 6 items). No other text. Example: table, lamp, window, book, person, wall' }
-          ]
-        }]
-      })
-    });
-    const data = await resp.json();
-    const raw = data.content?.[0]?.text || '';
-    const detected = raw.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
-    console.log('Detected:', detected);
-    ov.classList.remove('on');
-    ov.style.pointerEvents = 'none';
-    processDetections(detected);
-  } catch(e) {
-    console.error(e);
-    ov.classList.remove('on');
-    ov.style.pointerEvents = 'none';
-    processDetections(['table','window','lamp']);
-  }
+async function triggerScan(){
+  const ov=document.getElementById('ai-ov');const lb=document.getElementById('ai-lbl');
+  ov.classList.add('on');ov.style.pointerEvents='all';
+  document.getElementById('hud-lbl').textContent='Analisi…';
+  const v=document.getElementById('video');
+  const sn=document.createElement('canvas');sn.width=Math.min(v.videoWidth||640,640);sn.height=Math.min(v.videoHeight||480,480);
+  sn.getContext('2d').drawImage(v,0,0,sn.width,sn.height);
+  const b64=sn.toDataURL('image/jpeg',.75).split(',')[1];
+  lb.textContent='Identifico gli oggetti…';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:150,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+        {type:'text',text:'List ONLY objects in this room. Reply with comma-separated English words only, max 6. No extra text. Example: table, lamp, window, book'}
+      ]}]})});
+    const d=await r.json();const raw=d.content?.[0]?.text||'';
+    const det=raw.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
+    ov.classList.remove('on');ov.style.pointerEvents='none';process(det);
+  }catch(e){ov.classList.remove('on');ov.style.pointerEvents='none';process(['table','lamp','window']);}
 }
 
-// ══════ PROCESS DETECTIONS ══════
-function processDetections(detected) {
-  const matched = new Set();
-  detected.forEach(word => {
-    Object.entries(DB).forEach(([key, cat]) => {
-      if (key==='default') return;
-      if (cat.objects.some(o => word.includes(o) || o.includes(word))) matched.add(key);
-    });
-  });
-  if (matched.size===0) matched.add('default');
-
-  // Remove old bubbles
-  bubbles.forEach(b => b.el?.remove());
-  bubbles = [];
-
-  const keys = [...matched].slice(0, 4);
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const positions = [
-    {x:vw*.07, y:vh*.12}, {x:vw*.48, y:vh*.10},
-    {x:vw*.05, y:vh*.48}, {x:vw*.5,  y:vh*.50},
-  ];
-  // Origins spread across the middle of the screen
-  const origins = [
-    {x:vw*.25, y:vh*.5}, {x:vw*.6, y:vh*.45},
-    {x:vw*.3,  y:vh*.65},{x:vw*.65, y:vh*.65},
-  ];
-
-  keys.forEach((key, i) => {
-    const cat = DB[key];
-    const f = cat.formulas[i % cat.formulas.length];
-    spawnBubble(f, cat, positions[i]||{x:vw*.2,y:vh*.2}, origins[i]||{x:vw*.5,y:vh*.5});
-  });
-
-  document.getElementById('hud-txt').textContent = `${keys.length} OGGETTI`;
+function process(det){
+  const m=new Set();
+  det.forEach(w=>Object.entries(DB).forEach(([k,c])=>{if(k==='default')return;if(c.objects.some(o=>w.includes(o)||o.includes(w)))m.add(k);}));
+  if(m.size===0)m.add('default');
+  bubbles.forEach(b=>b.el?.remove());bubbles=[];
+  const keys=[...m].slice(0,4);const vw=window.innerWidth,vh=window.innerHeight;
+  const pos=[{x:vw*.05,y:vh*.10},{x:vw*.48,y:vh*.08},{x:vw*.04,y:vh*.46},{x:vw*.5,y:vh*.48}];
+  const ori=[{x:vw*.28,y:vh*.52},{x:vw*.65,y:vh*.45},{x:vw*.25,y:vh*.68},{x:vw*.68,y:vh*.65}];
+  keys.forEach((k,i)=>{const c=DB[k];spawnCard(c.formulas[0],c,pos[i]||{x:vw*.1,y:vh*.1},ori[i]||{x:vw*.5,y:vh*.5});});
+  document.getElementById('hud-lbl').textContent=keys.length+' oggetti';
 }
 
-// ══════ SPAWN BUBBLE ══════
-function spawnBubble(formula, cat, pos, origin) {
-  const el = document.createElement('div');
-  el.className = 'fbubble';
-  el.style.cssText = `left:${pos.x}px;top:${pos.y}px;z-index:${++zTop};border-color:${cat.color}35;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px ${cat.color}20;`;
-  el.innerHTML = `
-    <div class="fb-close" onclick="removeBubble(this.parentNode)">✕</div>
-    <div class="fb-obj" style="color:${cat.color}bb;">${cat.icon} ${cat.label}</div>
-    <div class="fb-name">${formula.name}</div>
-    <div class="fb-eq" style="color:${cat.color}">${formula.eq}</div>
-    <div class="fb-desc">${formula.desc}</div>
-  `;
+function spawnCard(f,cat,pos,ori){
+  const el=document.createElement('div');el.className='fcard';
+  el.style.cssText=`left:${pos.x}px;top:${pos.y}px;z-index:${++zTop};`;
+  el.innerHTML=`<div class="fc-bar" style="background:${cat.color}55;"></div><div class="fc-close" onclick="rmCard(this.parentNode)">✕</div><div class="fc-body"><div class="fc-cat" style="color:${cat.color}">${cat.icon} ${cat.label}</div><div class="fc-name">${f.name}</div><div class="fc-eq" style="color:${cat.color}">${f.eq}</div><div class="fc-hint">👆 Tocca per dettagli</div></div>`;
+  el.querySelector('.fc-body').addEventListener('click',()=>openDet(f,cat));
   document.body.appendChild(el);
-  const b = { el, x:pos.x, y:pos.y, ox:origin.x, oy:origin.y, color:cat.color };
-  bubbles.push(b);
-  makeDraggable(el, b);
-  makePinchable(el);
-  return b;
+  const b={el,x:pos.x,y:pos.y,ox:ori.x,oy:ori.y,color:cat.color};
+  bubbles.push(b);drag(el,b);pinch(el);return b;
 }
 
-function removeBubble(el) {
-  el.style.transition='opacity .3s,transform .3s'; el.style.opacity='0'; el.style.transform='scale(.6)';
-  setTimeout(()=>{ el.remove(); bubbles=bubbles.filter(b=>b.el!==el); }, 300);
+function rmCard(el){el.style.transition='opacity .3s,transform .3s';el.style.opacity='0';el.style.transform='scale(.5)';setTimeout(()=>{el.remove();bubbles=bubbles.filter(b=>b.el!==el);},300);}
+
+function openDet(f,cat){
+  curDet={f,cat};
+  document.getElementById('dp-cat').textContent=f.cat;document.getElementById('dp-cat').style.color=cat.color;
+  document.getElementById('dp-title').textContent=f.name;
+  const eb=document.getElementById('dp-eqb');eb.style.background=cat.bg;eb.style.border=`1px solid ${cat.color}25`;
+  document.getElementById('dp-eq').textContent=f.eq;document.getElementById('dp-eq').style.color=cat.color;
+  document.getElementById('dp-eqn').textContent=f.name;
+  document.getElementById('dp-expl').textContent=f.expl;
+  document.getElementById('dp-vars').innerHTML=f.vars.map(v=>`<div class="dp-var"><div class="dp-v-sym" style="color:${cat.color}">${v.s}</div><div><div class="dp-v-n">${v.n}</div><div class="dp-v-u">${v.u}</div></div></div>`).join('');
+  document.getElementById('dp-ex').textContent=f.ex;
+  document.getElementById('det-bd').classList.add('on');
 }
+function closeDet(e){if(e&&e.target!==document.getElementById('det-bd'))return;document.getElementById('det-bd').classList.remove('on');}
 
-// ══════ DRAW LINES ══════
-function drawLines() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  const t = performance.now();
-  bubbles.forEach(b => {
-    if (!b.el?.isConnected) return;
-    const r = b.el.getBoundingClientRect();
-    const bx = r.left + r.width/2, by = r.top + r.height/2;
+function saveF(){if(!curDet)return;const k=curDet.f.name;if(!saved.find(s=>s===k))saved.push(k);toast('🔖 "'+curDet.f.name+'" salvata');document.getElementById('det-bd').classList.remove('on');}
+function shareF(){if(!curDet)return;const f=curDet.f;const t=f.name+'\n'+f.eq+'\n\n'+f.expl+'\n\nMathAR';if(navigator.share){navigator.share({title:'MathAR — '+f.name,text:t}).catch(()=>{});}else{navigator.clipboard?.writeText(t).then(()=>toast('📋 Copiata negli appunti'));}}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-    // Dashed animated line
-    ctx.save();
-    ctx.setLineDash([4,8]);
-    ctx.lineDashOffset = -(t/40);
-    ctx.strokeStyle = b.color+'55';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(b.ox,b.oy); ctx.lineTo(bx,by); ctx.stroke();
-
-    // Dot at origin
-    ctx.setLineDash([]);
-    ctx.fillStyle = b.color+'cc';
-    ctx.beginPath(); ctx.arc(b.ox,b.oy,5,0,Math.PI*2); ctx.fill();
-
-    // Expanding ripple
-    const phase = (t%2000)/2000;
-    const rAlpha = Math.floor((1-phase)*160).toString(16).padStart(2,'0');
-    ctx.strokeStyle = b.color+rAlpha;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(b.ox,b.oy,phase*30,0,Math.PI*2); ctx.stroke();
-
+function drawLines(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);const t=performance.now();
+  bubbles.forEach(b=>{
+    if(!b.el?.isConnected)return;const r=b.el.getBoundingClientRect();const bx=r.left+r.width/2,by=r.top;
+    ctx.save();ctx.setLineDash([3,7]);ctx.lineDashOffset=-(t/50);ctx.strokeStyle=b.color+'44';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(b.ox,b.oy);ctx.lineTo(bx,by);ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle=b.color+'cc';ctx.beginPath();ctx.arc(b.ox,b.oy,4,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=b.color+'55';ctx.lineWidth=1;ctx.beginPath();ctx.arc(b.ox,b.oy,7,0,Math.PI*2);ctx.stroke();
+    const ph=(t%2500)/2500;const al=Math.floor((1-ph)*120).toString(16).padStart(2,'0');
+    ctx.strokeStyle=b.color+al;ctx.lineWidth=1;ctx.beginPath();ctx.arc(b.ox,b.oy,ph*24,0,Math.PI*2);ctx.stroke();
     ctx.restore();
   });
   requestAnimationFrame(drawLines);
 }
 
-// ══════ DRAG ══════
-function makeDraggable(el, bubble) {
-  let d=false, sx,sy,il,it;
-  const dn = e => {
-    if(e.target.classList.contains('fb-close')) return;
-    d=true; el.classList.add('dragging'); el.style.zIndex=++zTop;
-    const t=e.touches?e.touches[0]:e; sx=t.clientX; sy=t.clientY;
-    il=parseFloat(el.style.left)||0; it=parseFloat(el.style.top)||0;
-    e.preventDefault();
-  };
-  const mv = e => {
-    if(!d) return;
-    const t=e.touches?e.touches[0]:e;
-    el.style.left=(il+t.clientX-sx)+'px'; el.style.top=(it+t.clientY-sy)+'px';
-    if(bubble){bubble.x=parseFloat(el.style.left);bubble.y=parseFloat(el.style.top);}
-    e.preventDefault();
-  };
-  const up = ()=>{ d=false; el.classList.remove('dragging'); };
-  el.addEventListener('touchstart',dn,{passive:false});
-  el.addEventListener('touchmove',mv,{passive:false});
-  el.addEventListener('touchend',up);
-  el.addEventListener('mousedown',dn);
-  window.addEventListener('mousemove',mv);
-  window.addEventListener('mouseup',up);
+function drag(el,bubble){
+  let d=false,sx,sy,il,it;
+  const dn=e=>{if(e.target.classList.contains('fc-close'))return;d=true;el.classList.add('dragging');el.style.zIndex=++zTop;const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;il=parseFloat(el.style.left)||0;it=parseFloat(el.style.top)||0;e.preventDefault();};
+  const mv=e=>{if(!d)return;const t=e.touches?e.touches[0]:e;el.style.left=(il+t.clientX-sx)+'px';el.style.top=(it+t.clientY-sy)+'px';if(bubble){bubble.x=parseFloat(el.style.left);bubble.y=parseFloat(el.style.top);}e.preventDefault();};
+  const up=()=>{d=false;el.classList.remove('dragging');};
+  el.addEventListener('touchstart',dn,{passive:false});el.addEventListener('touchmove',mv,{passive:false});el.addEventListener('touchend',up);
+  el.addEventListener('mousedown',dn);window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
 }
+function pinch(el){let id=null,is=1;el.addEventListener('touchstart',e=>{if(e.touches.length===2){id=dst(e.touches);is=gts(el);}},{passive:true});el.addEventListener('touchmove',e=>{if(e.touches.length===2&&id){const s=Math.max(.5,Math.min(2.5,is*dst(e.touches)/id));el.style.transform=`scale(${s})`;}},{passive:true});el.addEventListener('touchend',()=>id=null);}
+const dst=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+const gts=el=>{const m=(el.style.transform||'').match(/scale\(([^)]+)\)/);return m?+m[1]:1;};
 
-// ══════ PINCH ══════
-function makePinchable(el) {
-  let id=null, is=1;
-  el.addEventListener('touchstart',e=>{ if(e.touches.length===2){id=dist(e.touches);is=getS(el);} },{passive:true});
-  el.addEventListener('touchmove',e=>{ if(e.touches.length===2&&id){ const s=Math.max(.4,Math.min(3,is*dist(e.touches)/id)); el.style.transform=`scale(${s})`; } },{passive:true});
-  el.addEventListener('touchend',()=>id=null);
-}
-const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
-const getS=el=>{ const m=(el.style.transform||'').match(/scale\(([^)]+)\)/); return m?+m[1]:1; };
-
-// ══════ TOOLBAR ══════
-function buildToolbar() {
-  const row = document.getElementById('tb-row');
-  Object.entries(DB).forEach(([key,cat]) => {
-    const btn = document.createElement('div');
-    btn.className='tb-btn'; btn.style.borderColor=cat.color+'30';
-    btn.innerHTML=`<div class="tb-icon">${cat.icon}</div><div class="tb-lbl" style="color:${cat.color}">${cat.label.split('·')[0].trim()}</div>`;
-    btn.addEventListener('pointerdown',()=>{
-      const vw=window.innerWidth,vh=window.innerHeight;
-      const f=cat.formulas[Math.floor(Math.random()*cat.formulas.length)];
-      spawnBubble(f,cat,{x:vw*.15+Math.random()*vw*.55,y:vh*.15+Math.random()*vh*.35},{x:vw*.5,y:vh*.5});
-    });
-    row.appendChild(btn);
+function buildTB(){
+  const r=document.getElementById('tb-r');
+  Object.entries(DB).forEach(([k,c])=>{
+    const b=document.createElement('div');b.className='tb-i';
+    b.innerHTML=`<div class="tb-ico">${c.icon}</div><div class="tb-lbl">${c.label.split('&')[0].trim()}</div>`;
+    b.addEventListener('pointerdown',()=>{const vw=window.innerWidth,vh=window.innerHeight;const f=c.formulas[Math.floor(Math.random()*c.formulas.length)];spawnCard(f,c,{x:vw*.1+Math.random()*vw*.55,y:vh*.1+Math.random()*vh*.35},{x:vw*.4+Math.random()*vw*.2,y:vh*.45+Math.random()*vh*.15});});
+    r.appendChild(b);
   });
 }
-
 document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 </script>
 </body>
